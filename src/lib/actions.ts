@@ -44,6 +44,7 @@ export async function registerEquipment(
     const newEquipment = await addEquipment(validatedFields.data);
     await addLog({ equipmentId: newEquipment.id, action: 'Registered' });
   } catch (error) {
+    console.error('Database Error:', error);
     return {
       message: 'Database Error: Failed to create equipment.',
       success: false,
