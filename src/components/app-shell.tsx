@@ -14,7 +14,7 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { Home, PlusCircle, Package, History, QrCode, LogIn, LogOut } from 'lucide-react';
+import { Home, PlusCircle, Package, History, QrCode, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { Button } from './ui/button';
@@ -68,16 +68,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               ))}
             </SidebarMenu>
           ) : (
-               <SidebarMenu>
-                   <SidebarMenuItem>
-                      <SidebarMenuButton asChild isActive={pathname === '/login'}>
-                          <Link href="/login">
-                              <LogIn />
-                              <span>Login</span>
-                          </Link>
-                      </SidebarMenuButton>
-                  </SidebarMenuItem>
-               </SidebarMenu>
+            <div className="p-4 text-sm text-muted-foreground">
+              Please log in to manage equipment.
+            </div>
           )}
         </SidebarContent>
          {user && (

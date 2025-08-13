@@ -1,4 +1,3 @@
-
 'use client';
 
 import { useActionState, useEffect, useRef } from 'react';
@@ -10,7 +9,6 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle, CardFooter }
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type LoginState, signInWithEmail } from '@/lib/actions';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 
 
@@ -24,33 +22,16 @@ function SubmitButton() {
   );
 }
 
-export default function LoginPage() {
+export function LoginForm() {
   const initialState: LoginState = { message: '', success: false };
   const [state, dispatch] = useActionState(signInWithEmail, initialState);
   const { toast } = useToast();
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const { user, loading } = useAuth();
-
-
-  useEffect(() => {
-    // If the user is already logged in (e.g. from a previous session or after a successful login), 
-    // redirect them to the dashboard. This is the primary redirect logic.
-    if (!loading && user) {
-      router.push('/');
-    }
-  }, [user, loading, router]);
-
-
+  
   useEffect(() => {
     // This effect handles the result of the form submission
     if (state.success) {
-      toast({
-        title: 'Success!',
-        description: state.message,
-      });
-      // The redirect is now handled by the effect above, which waits for the 
-      // auth state to be confirmed on the client.
+      // Don't need to show success toast, the redirect is enough.
     } else if (state.message) {
       toast({
         variant: "destructive",

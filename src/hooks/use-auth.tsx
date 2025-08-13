@@ -5,7 +5,6 @@ import { useState, useEffect, createContext, useContext, type ReactNode } from '
 import { onAuthStateChanged, type User, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { usePathname, useRouter } from 'next/navigation';
-import { Loader2 } from 'lucide-react';
 
 interface AuthContextType {
   user: User | null;
@@ -15,8 +14,7 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const publicRoutes = ['/login']; // Routes accessible without authentication
-const equipmentRoutesPattern = /^\/equipment\/.*$/; // Regex for equipment routes
+const protectedRoutes = ['/history', '/qr-codes', '/equipment/new'];
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -35,30 +33,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    const isPublic = publicRoutes.includes(pathname) || equipmentRoutesPattern.test(pathname);
-
-    // If auth state is loaded, there is no user, and they are on a protected route,
-    // redirect them to the login page.
-    if (!user && !isPublic) {
-      router.push('/login');
+    // If the route is protected and there's no user, redirect to the root.
+    // The root page will then show the login form.
+    if (!user && protectedRoutes.includes(pathname)) {
+      router.push('/');
     }
-    
   }, [user, loading, pathname, router]);
+
 
   const logout = async () => {
     await signOut(auth);
-    router.push('/login');
+    router.push('/');
   };
 
   const value = { user, loading, logout };
-  
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="w-12 h-12 animate-spin" />
-      </div>
-    );
-  }
   
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
