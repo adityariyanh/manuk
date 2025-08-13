@@ -9,7 +9,8 @@ export function QrCodeCard({ equipmentId }: { equipmentId: string }) {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
 
   useEffect(() => {
-    const url = `${window.location.origin}/equipment/${equipmentId}`;
+    // The QR code now points to the dedicated action URL
+    const url = `${window.location.origin}/equipment/${equipmentId}/action`;
     setQrCodeUrl(
       `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
         url
@@ -21,7 +22,7 @@ export function QrCodeCard({ equipmentId }: { equipmentId: string }) {
     <Card>
       <CardHeader>
         <CardTitle>QR Code</CardTitle>
-        <CardDescription>Scan to check-in or check-out.</CardDescription>
+        <CardDescription>Scan to take action on this item.</CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center items-center p-6">
         {qrCodeUrl ? (
