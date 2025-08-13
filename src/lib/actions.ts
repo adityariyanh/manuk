@@ -225,13 +225,22 @@ export type LoginState = {
   success: boolean;
 };
 
-export async function signInWithEmail(prevState: LoginState, formData: FormData): Promise<LoginState> {
-  const email = formData.get('email') as string;
-  const password = formData.get('password') as string;
+const loginSchema = z.object({
+  email: z.string().email('Invalid email address.'),
+  password: z.string().min(1, 'Password cannot be empty.'),
+});
 
-  if (!email || !password) {
-    return { message: 'Email and password are required.', success: false };
+
+export async function signInWithEmail(credentials: z.infer<typeof loginSchema>): Promise<LoginState> {
+  const validatedCredentials = loginSchema.safeParse(credentials);
+
+  if (!validatedCredentials.success) {
+    const errors = validatedCredentials.error.flatten().fieldErrors;
+    const errorMessage = errors.email?.[0] || errors.password?.[0] || 'Invalid credentials';
+    return { message: errorMessage, success: false };
   }
+
+  const { email, password } = validatedCredentials.data;
 
   try {
     await signInWithEmailAndPassword(auth, email, password);
