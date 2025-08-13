@@ -86,14 +86,12 @@ export function Dashboard() {
       <main className="flex-1 p-4 overflow-y-auto">
         {equipment.length > 0 ? (
           <div className="border rounded-lg">
-            <Table className="table-fixed w-full">
+            <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[50%] lg:w-[45%]">Name</TableHead>
-                  <TableHead className="hidden lg:table-cell lg:w-[30%]">
-                    Model
-                  </TableHead>
-                  <TableHead className="text-right w-[40%] lg:w-[25%]">
+                  <TableHead className="w-[60%]">Name</TableHead>
+                  <TableHead className="w-[120px]">Status</TableHead>
+                  <TableHead className="text-right w-[150px]">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -102,19 +100,13 @@ export function Dashboard() {
                 {equipment.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">
-                       <div className="flex flex-col sm:flex-row sm:items-center sm:gap-2">
-                         <div className="font-medium truncate">{item.name}</div>
-                         <div className="hidden sm:block"><StatusBadge status={item.status} /></div>
-                       </div>
-                      <div className="text-sm text-muted-foreground lg:hidden">
+                       <div className="font-medium truncate">{item.name}</div>
+                       <div className="text-sm text-muted-foreground">
                         {item.brand} - {item.model}
                       </div>
-                      <div className="sm:hidden mt-2">
-                        <StatusBadge status={item.status} />
-                      </div>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell truncate">
-                      {item.model}
+                    <TableCell>
+                      <StatusBadge status={item.status} />
                     </TableCell>
                     <TableCell className="text-right">
                       <DashboardActions equipment={item} onActionSuccess={fetchData} />
