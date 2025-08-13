@@ -3,7 +3,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getAllEquipment, getEquipmentById, updateEquipment } from './data';
+import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getAllEquipment, getEquipmentById, updateEquipment, deleteField } from './data';
 import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
 
@@ -77,7 +77,7 @@ export async function checkoutEquipment(
       status: 'Borrowed', 
       borrowedBy: user,
       borrowedFrom: borrowedFrom || new Date(),
-      borrowedUntil: borrowedUntil || addDays(new Date(), 1), // Default to 1 day if not provided
+      borrowedUntil: borrowedUntil || addDays(new Date(), 1),
       reminderSent: false,
     };
 
@@ -105,7 +105,7 @@ export async function checkinEquipment(equipmentId: string) {
     if (equipment) {
       await addLog({ equipmentId, action: 'Returned', user: equipment.borrowedBy });
     }
-    // Reset borrow-related fields. Using null to clear fields in Firestore.
+    
     await updateEquipment(equipmentId, { 
       status: 'Available', 
       borrowedBy: null,
@@ -199,28 +199,19 @@ export async function checkReminders() {
     const allEquipment = await getAllEquipment();
     const borrowedItems = allEquipment.filter(
       (e) =>
-        e.status === 'Borrowed' &&
+        (e.status === 'Borrowed' || e.status === 'Follow Up') &&
         e.borrowedUntil &&
         !e.reminderSent
     );
 
-    let shouldRevalidate = false;
     for (const item of borrowedItems) {
-      const borrowedUntilDate = startOfDay(item.borrowedUntil!); // Use non-null assertion
+      if (!item.borrowedUntil) continue;
+      const borrowedUntilDate = startOfDay(item.borrowedUntil);
       
-      // Check if the return date is on or before two days from now
       if (borrowedUntilDate <= twoDaysFromNow) {
         console.log(`Follow up triggered for ${item.name}. Due on: ${borrowedUntilDate.toDateString()}`);
         await updateEquipment(item.id, { status: 'Follow Up', reminderSent: true });
-        shouldRevalidate = true;
       }
-    }
-
-    if (shouldRevalidate) {
-      revalidatePath('/');
-      console.log('Follow up check complete. Paths revalidated.');
-    } else {
-      console.log('Follow up check complete. No new reminders.');
     }
   } catch (error) {
     console.error("Error checking for follow ups:", error);
