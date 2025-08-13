@@ -8,7 +8,7 @@ const globalForStore = globalThis as unknown as {
 };
 
 
-const equipmentStore: Equipment[] = globalForStore.equipmentStore || [
+let equipmentStore: Equipment[] = globalForStore.equipmentStore || [
   {
     id: '1',
     name: 'Canon EOS R5',
@@ -40,7 +40,7 @@ const equipmentStore: Equipment[] = globalForStore.equipmentStore || [
   },
 ];
 
-const logStore: LogEntry[] = globalForStore.logStore || [
+let logStore: LogEntry[] = globalForStore.logStore || [
   { id: 'l1', equipmentId: '1', action: 'Registered', timestamp: new Date('2022-03-15') },
   { id: 'l2', equipmentId: '2', action: 'Registered', timestamp: new Date('2023-01-20') },
   { id: 'l3', equipmentId: '2', action: 'Borrowed', user: 'Alice', timestamp: new Date('2024-05-10') },
@@ -114,4 +114,15 @@ export async function getHistoricalBorrowingDataString(): Promise<string> {
         return `User ${log.user || 'Unknown'} borrowed a ${equipment?.model || 'Unknown item'} (${equipment?.name || 'Unknown name'}) on ${log.timestamp.toDateString()}.`;
     }).join('\n');
     return Promise.resolve(dataString);
+}
+
+export async function deleteEquipment(id: string): Promise<void> {
+    const index = equipmentStore.findIndex((e) => e.id === id);
+    if (index !== -1) {
+        equipmentStore.splice(index, 1);
+        // Also remove logs associated with the deleted equipment
+        logStore = logStore.filter(log => log.equipmentId !== id);
+        return Promise.resolve();
+    }
+    return Promise.reject('Equipment not found');
 }

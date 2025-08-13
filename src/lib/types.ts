@@ -9,7 +9,7 @@ export interface Equipment {
   borrowedBy?: string;
 }
 
-export type LogAction = 'Registered' | 'Borrowed' | 'Returned' | 'Reported for Repair' | 'Repaired';
+export type LogAction = 'Registered' | 'Borrowed' | 'Returned' | 'Reported for Repair' | 'Repaired' | 'Deleted';
 
 export interface LogEntry {
   id: string;

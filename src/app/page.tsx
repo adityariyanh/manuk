@@ -62,10 +62,10 @@ export default async function DashboardPage() {
                     <TableCell>{item.borrowedBy || 'N/A'}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
-                        <DashboardActions equipment={item} />
                         <Button asChild variant="outline" size="sm">
                           <Link href={`/equipment/${item.id}`}>Details</Link>
                         </Button>
+                        <DashboardActions equipment={item} />
                       </div>
                     </TableCell>
                   </TableRow>

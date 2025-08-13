@@ -3,7 +3,7 @@
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { addEquipment, addLog, getEquipmentById, getHistoricalBorrowingDataString, updateEquipment } from './data';
+import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getEquipmentById, getHistoricalBorrowingDataString, updateEquipment } from './data';
 import { suggestReplacementEquipment } from '@/ai/flows/suggest-replacement-equipment';
 
 const equipmentSchema = z.object({
@@ -141,5 +141,17 @@ export async function reportForRepair(
 
     } catch (error) {
         return { message: "An error occurred", error: error instanceof Error ? error.message : String(error) };
+    }
+}
+
+export async function deleteEquipment(equipmentId: string) {
+    try {
+        await deleteEquipmentData(equipmentId);
+        revalidatePath('/');
+        revalidatePath('/history');
+        return { success: true, message: 'Equipment deleted successfully.' };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'Failed to delete equipment.';
+        return { success: false, message };
     }
 }
