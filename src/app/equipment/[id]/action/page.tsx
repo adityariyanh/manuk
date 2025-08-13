@@ -13,7 +13,8 @@ type Props = {
   params: { id: string };
 };
 
-export default async function EquipmentActionPage({ params }: Props) {
+export default async function EquipmentActionPage(props: Props) {
+  const { params } = props;
   const equipment = await getEquipmentById(params.id);
 
   if (!equipment) {
