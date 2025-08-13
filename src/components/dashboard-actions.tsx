@@ -48,7 +48,7 @@ import { Calendar } from './ui/calendar';
 export function DashboardActions({ equipment }: { equipment: Equipment }) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
-  
+
   // State for the checkout modal
   const [borrowerName, setBorrowerName] = useState('');
   const [borrowerPhone, setBorrowerPhone] = useState('');
@@ -61,7 +61,6 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
   });
   const [isModalOpen, setModalOpen] = useState(false);
 
-
   const handleCheckout = () => {
     if (!borrowerName.trim() || !place.trim() || !description.trim()) {
       toast({
@@ -72,7 +71,9 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
       return;
     }
     startTransition(async () => {
-      const borrowedUntil = isOneDayCheckout ? addDays(new Date(), 1) : dateRange?.to;
+      const borrowedUntil = isOneDayCheckout
+        ? addDays(new Date(), 1)
+        : dateRange?.to;
       const result = await checkoutEquipment(
         equipment.id,
         borrowerName,
@@ -174,15 +175,17 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
                     required
                   />
                 </div>
-                 <div className="space-y-2">
-                    <Label htmlFor="borrowerPhone">Phone Number (Optional)</Label>
-                    <Input
+                <div className="space-y-2">
+                  <Label htmlFor="borrowerPhone">
+                    Phone Number (Optional)
+                  </Label>
+                  <Input
                     id="borrowerPhone"
                     name="borrowerPhone"
                     placeholder="e.g. 08123456789"
                     value={borrowerPhone}
-                    onChange={e => setBorrowerPhone(e.target.value)}
-                    />
+                    onChange={(e) => setBorrowerPhone(e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="place">Place</Label>
@@ -204,77 +207,95 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
                     required
                   />
                 </div>
-                 <div className="flex items-center space-x-2">
-                    <Checkbox 
-                    id="one-day-checkout-modal" 
+                <div className="flex items-center space-x-2">
+                  <Checkbox
+                    id="one-day-checkout-modal"
                     checked={isOneDayCheckout}
-                    onCheckedChange={(checked) => setIsOneDayCheckout(Boolean(checked))}
-                    />
-                    <label
+                    onCheckedChange={(checked) =>
+                      setIsOneDayCheckout(Boolean(checked))
+                    }
+                  />
+                  <label
                     htmlFor="one-day-checkout-modal"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                    >
+                  >
                     1-Day Checkout (Return tomorrow)
-                    </label>
+                  </label>
                 </div>
 
                 {!isOneDayCheckout && (
-                    <div className="space-y-2">
-                      <Label>Select Borrowing Period</Label>
-                      <div className="grid grid-cols-2 gap-2">
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant={"outline"}
-                                className="w-full justify-start text-left font-normal"
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateRange?.from ? format(dateRange.from, "LLL dd, y") : <span>Borrow Date</span>}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={dateRange?.from}
-                                onSelect={(date) => setDateRange(prev => ({...prev, from: date}))}
-                                disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                          <Popover>
-                            <PopoverTrigger asChild>
-                              <Button
-                                variant={"outline"}
-                                className="w-full justify-start text-left font-normal"
-                              >
-                                <CalendarIcon className="mr-2 h-4 w-4" />
-                                {dateRange?.to ? format(dateRange.to, "LLL dd, y") : <span>Return Date</span>}
-                              </Button>
-                            </PopoverTrigger>
-                            <PopoverContent className="w-auto p-0" align="start">
-                              <Calendar
-                                mode="single"
-                                selected={dateRange?.to}
-                                onSelect={(date) => setDateRange(prev => ({...prev, to: date}))}
-                                disabled={(date) => 
-                                    (dateRange?.from && date < dateRange.from) || 
-                                    date < new Date(new Date().setHours(0,0,0,0))
-                                }
-                                initialFocus
-                              />
-                            </PopoverContent>
-                          </Popover>
-                      </div>
-                       <Button 
-                          type="button" 
-                          variant="ghost" 
-                          className="w-full"
-                          onClick={() => setDateRange(prev => ({...prev, from: new Date()}))}
-                        >
-                          Set Borrow Date to Today
-                        </Button>
+                  <div className="space-y-2">
+                    <Label>Select Borrowing Period</Label>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={'outline'}
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.from ? (
+                              format(dateRange.from, 'LLL dd, y')
+                            ) : (
+                              <span>Borrow Date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateRange?.from}
+                            onSelect={(date) =>
+                              setDateRange((prev) => ({ ...prev, from: date }))
+                            }
+                            disabled={(date) =>
+                              date < new Date(new Date().setHours(0, 0, 0, 0))
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={'outline'}
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.to ? (
+                              format(dateRange.to, 'LLL dd, y')
+                            ) : (
+                              <span>Return Date</span>
+                            )}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateRange?.to}
+                            onSelect={(date) =>
+                              setDateRange((prev) => ({ ...prev, to: date }))
+                            }
+                            disabled={(date) =>
+                              (dateRange?.from && date < dateRange.from) ||
+                              date < new Date(new Date().setHours(0, 0, 0, 0))
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
                     </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      className="w-full"
+                      onClick={() =>
+                        setDateRange((prev) => ({ ...prev, from: new Date() }))
+                      }
+                    >
+                      Set Borrow Date to Today
+                    </Button>
+                  </div>
                 )}
               </div>
               <AlertDialogFooter>
@@ -314,53 +335,73 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
   };
 
   return (
-    <div className="flex items-center justify-end gap-2">
-      {renderAction()}
-      <AlertDialog>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" className="h-8 w-8">
-              <MoreHorizontal className="h-4 w-4" />
-              <span className="sr-only">More actions</span>
+    <AlertDialog>
+      <div className="flex items-center justify-end gap-2">
+        {renderAction()}
+
+        {/* Desktop Actions */}
+        <div className="hidden md:flex items-center gap-2">
+          <Button asChild variant="outline" size="sm">
+            <Link href={`/equipment/${equipment.id}`}>
+              <FileText />
+              <span className="ml-2">Details</span>
+            </Link>
+          </Button>
+          <AlertDialogTrigger asChild>
+            <Button variant="destructive" size="sm">
+              <Trash2 />
+              <span className="ml-2">Delete</span>
             </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem asChild>
-              <Link href={`/equipment/${equipment.id}`}>
-                <FileText className="mr-2" />
-                Details
-              </Link>
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <AlertDialogTrigger asChild>
-              <DropdownMenuItem className="text-destructive focus:text-destructive">
-                <Trash2 className="mr-2" />
-                Delete
+          </AlertDialogTrigger>
+        </div>
+
+        {/* Mobile Actions */}
+        <div className="md:hidden">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" className="h-8 w-8">
+                <MoreHorizontal className="h-4 w-4" />
+                <span className="sr-only">More actions</span>
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem asChild>
+                <Link href={`/equipment/${equipment.id}`}>
+                  <FileText className="mr-2" />
+                  Details
+                </Link>
               </DropdownMenuItem>
-            </AlertDialogTrigger>
-          </DropdownMenuContent>
-        </DropdownMenu>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Are you sure?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete the
-              equipment "{equipment.name}" and all of its history.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction
-              onClick={handleDelete}
-              disabled={isPending}
-              className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
-            >
-              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
-    </div>
+              <DropdownMenuSeparator />
+              <AlertDialogTrigger asChild>
+                <DropdownMenuItem className="text-destructive focus:text-destructive">
+                  <Trash2 className="mr-2" />
+                  Delete
+                </DropdownMenuItem>
+              </AlertDialogTrigger>
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      </div>
+      <AlertDialogContent>
+        <AlertDialogHeader>
+          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogDescription>
+            This action cannot be undone. This will permanently delete the
+            equipment "{equipment.name}" and all of its history.
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogAction
+            onClick={handleDelete}
+            disabled={isPending}
+            className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
+          >
+            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+            Delete
+          </AlertDialogAction>
+        </AlertDialogFooter>
+      </AlertDialogContent>
+    </AlertDialog>
   );
 }
