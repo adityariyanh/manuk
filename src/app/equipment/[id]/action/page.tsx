@@ -1,6 +1,5 @@
-
 import { notFound, redirect } from 'next/navigation';
-import { getEquipmentById, getAllEquipment } from '@/lib/data';
+import { getEquipmentById } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,14 +13,7 @@ interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export async function generateStaticParams() {
-  const equipment = await getAllEquipment();
-  return equipment.map((item) => ({
-    id: item.id,
-  }));
-}
-
-export default async function EquipmentActionPage({ params }: PageProps) {
+export default async function EquipmentActionPage({ params, searchParams }: PageProps) {
   const equipment = await getEquipmentById(params.id);
 
   if (!equipment) {

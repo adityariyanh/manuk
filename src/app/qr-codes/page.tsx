@@ -18,15 +18,12 @@ import { QrCode, Download } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import * as XLSX from 'xlsx';
 import { ScrollArea } from '@/components/ui/scroll-area';
-import nextConfig from '../../../next.config';
 
 export default function QrCodesPage() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
   const [loading, setLoading] = useState(true);
   const { toast } = useToast();
   const [origin, setOrigin] = useState('');
-  const basePath = nextConfig.basePath || '';
-
 
   useEffect(() => {
     setOrigin(window.location.origin);
@@ -50,7 +47,7 @@ export default function QrCodesPage() {
 
   const getActionUrl = (equipmentId: string) => {
     if (!origin) return '';
-    return `${origin}${basePath}/equipment/${equipmentId}/action`;
+    return `${origin}/equipment/${equipmentId}/action`;
   };
 
   const copyToClipboard = (text: string) => {

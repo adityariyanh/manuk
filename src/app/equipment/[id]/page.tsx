@@ -1,5 +1,4 @@
-
-import { getEquipmentById, getLogsForEquipment, getAllEquipment } from '@/lib/data';
+import { getEquipmentById, getLogsForEquipment } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import {
   Card,
@@ -14,13 +13,6 @@ import { QrCodeCard } from '@/components/qr-code';
 import { EquipmentActions } from '@/components/equipment-actions';
 import { HistoryTable } from '@/components/history-table';
 import { format } from 'date-fns';
-
-export async function generateStaticParams() {
-  const equipment = await getAllEquipment();
-  return equipment.map((item) => ({
-    id: item.id,
-  }));
-}
 
 function StatusBadge({ status }: { status: EquipmentStatus }) {
   const variant: 'default' | 'secondary' | 'destructive' =
