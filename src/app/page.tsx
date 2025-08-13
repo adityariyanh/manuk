@@ -31,10 +31,16 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="p-4 border-b hidden md:block">
-        <h1 className="text-2xl font-bold font-headline">
-          Equipment Dashboard
-        </h1>
+       <header className="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+        <div>
+          <h1 className="text-2xl font-bold font-headline">
+            Equipment Dashboard
+          </h1>
+          <p className="text-muted-foreground">An overview of all equipment in the inventory.</p>
+        </div>
+         <Button asChild>
+          <Link href="/equipment/new">Add Equipment</Link>
+        </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
         {equipment.length > 0 ? (
@@ -43,9 +49,9 @@ export default async function DashboardPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[200px]">Name</TableHead>
-                  <TableHead className="min-w-[150px]">Model</TableHead>
+                  <TableHead className="hidden md:table-cell min-w-[150px]">Model</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead className="min-w-[150px]">Borrowed By</TableHead>
+                  <TableHead className="hidden lg:table-cell min-w-[150px]">Borrowed By</TableHead>
                   <TableHead className="w-[220px] text-right">
                     Actions
                   </TableHead>
@@ -55,11 +61,11 @@ export default async function DashboardPage() {
                 {equipment.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell>{item.model}</TableCell>
+                    <TableCell className="hidden md:table-cell">{item.model}</TableCell>
                     <TableCell>
                       <StatusBadge status={item.status} />
                     </TableCell>
-                    <TableCell>{item.borrowedBy || 'N/A'}</TableCell>
+                    <TableCell className="hidden lg:table-cell">{item.borrowedBy || 'N/A'}</TableCell>
                     <TableCell className="text-right">
                       <div className="flex items-center justify-end gap-2">
                         <Button asChild variant="outline" size="sm">
