@@ -20,6 +20,7 @@ import {
   checkoutEquipment,
   reportForRepair,
   type RepairState,
+  markAsRepaired,
 } from '@/lib/actions';
 import type { Equipment } from '@/lib/types';
 import {
@@ -28,6 +29,7 @@ import {
   Loader2,
   Wrench,
   Lightbulb,
+  CheckCircle,
 } from 'lucide-react';
 import { useState, useTransition, useEffect, useActionState } from 'react';
 import { useFormStatus } from 'react-dom';
@@ -153,6 +155,22 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
     });
   };
 
+  const handleRepair = () => {
+    startTransition(async () => {
+      const result = await markAsRepaired(equipment.id);
+      if (result.success) {
+        toast({ title: 'Success', description: result.message });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.message,
+        });
+      }
+    });
+  };
+
+
   return (
     <div className="flex flex-wrap gap-2">
       {equipment.status === 'Available' && (
@@ -198,6 +216,17 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
             <ArrowDownLeft className="mr-2" />
           )}
           Check-in
+        </Button>
+      )}
+
+      {equipment.status === 'Under Repair' && (
+        <Button onClick={handleRepair} disabled={isPending}>
+           {isPending ? (
+            <Loader2 className="mr-2 animate-spin" />
+          ) : (
+            <CheckCircle className="mr-2" />
+          )}
+          Mark as Repaired
         </Button>
       )}
 

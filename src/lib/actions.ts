@@ -74,6 +74,18 @@ export async function checkinEquipment(equipmentId: string) {
   }
 }
 
+export async function markAsRepaired(equipmentId: string) {
+  try {
+    await updateEquipment(equipmentId, { status: 'Available' });
+    await addLog({ equipmentId, action: 'Repaired', user: 'Admin' });
+    revalidatePath('/');
+    revalidatePath(`/equipment/${equipmentId}`);
+    return { success: true, message: 'Equipment marked as repaired.' };
+  } catch (error) {
+    return { success: false, message: 'Failed to mark equipment as repaired.' };
+  }
+}
+
 export type RepairState = {
   message: string;
   suggestions?: Awaited<ReturnType<typeof suggestReplacementEquipment>>;
