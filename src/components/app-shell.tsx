@@ -11,13 +11,18 @@ import {
   SidebarMenuButton,
   SidebarInset,
   SidebarTrigger,
+  SidebarFooter,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { Home, PlusCircle, Package, History, QrCode } from 'lucide-react';
+import { Home, PlusCircle, Package, History, QrCode, LogIn, LogOut } from 'lucide-react';
 import { usePathname } from 'next/navigation';
+import { AuthProvider, useAuth } from '@/hooks/use-auth';
+import { Button } from './ui/button';
+import { Skeleton } from './ui/skeleton';
 
-export function AppShell({ children }: { children: React.ReactNode }) {
+function AppNavigation() {
   const pathname = usePathname();
+  const { user, logout, loading } = useAuth();
 
   const menuItems = [
     { href: '/', label: 'Dashboard', icon: Home },
@@ -25,20 +30,26 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/history', label: 'History', icon: History },
     { href: '/qr-codes', label: 'QR Codes', icon: QrCode },
   ];
-
+  
   return (
-    <SidebarProvider>
-      <Sidebar>
-        <SidebarHeader>
-          <Link
-            href="/"
-            className="flex items-center gap-2 text-lg font-semibold text-primary"
-          >
-            <Package className="w-6 h-6" />
-            <span className="font-headline">MANUC</span>
-          </Link>
-        </SidebarHeader>
-        <SidebarContent>
+    <Sidebar>
+      <SidebarHeader>
+        <Link
+          href="/"
+          className="flex items-center gap-2 text-lg font-semibold text-primary"
+        >
+          <Package className="w-6 h-6" />
+          <span className="font-headline">MANUC</span>
+        </Link>
+      </SidebarHeader>
+      <SidebarContent>
+        {loading ? (
+            <div className='p-2 space-y-2'>
+                <Skeleton className='h-8 w-full' />
+                <Skeleton className='h-8 w-full' />
+                <Skeleton className='h-8 w-full' />
+            </div>
+        ): user ? (
           <SidebarMenu>
             {menuItems.map((item) => (
               <SidebarMenuItem key={item.href}>
@@ -55,15 +66,45 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </SidebarMenuItem>
             ))}
           </SidebarMenu>
-        </SidebarContent>
-      </Sidebar>
-      <SidebarInset>
-        <header className="p-4 flex items-center gap-4 md:hidden border-b sticky top-0 bg-background z-10">
-          <SidebarTrigger />
-          <h1 className="text-lg font-semibold">MANUC</h1>
-        </header>
-        {children}
-      </SidebarInset>
-    </SidebarProvider>
+        ) : (
+             <SidebarMenu>
+                 <SidebarMenuItem>
+                    <SidebarMenuButton asChild isActive={pathname === '/login'}>
+                        <Link href="/login">
+                            <LogIn />
+                            <span>Login</span>
+                        </Link>
+                    </SidebarMenuButton>
+                </SidebarMenuItem>
+             </SidebarMenu>
+        )}
+      </SidebarContent>
+       {user && (
+         <SidebarFooter>
+            <Button variant="ghost" onClick={logout} className="w-full justify-start">
+              <LogOut className="mr-2" />
+              Logout
+            </Button>
+          </SidebarFooter>
+       )}
+    </Sidebar>
+  )
+}
+
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+        <SidebarProvider>
+            <AppNavigation />
+            <SidebarInset>
+                <header className="p-4 flex items-center gap-4 md:hidden border-b sticky top-0 bg-background z-10">
+                <SidebarTrigger />
+                <h1 className="text-lg font-semibold">MANUC</h1>
+                </header>
+                {children}
+            </SidebarInset>
+        </SidebarProvider>
+    </AuthProvider>
   );
 }

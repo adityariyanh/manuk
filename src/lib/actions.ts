@@ -6,10 +6,12 @@ import { z } from 'zod';
 import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getAllEquipment, getEquipmentById, updateEquipment, deleteField } from './data';
 import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from './firebase';
 
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
-  brand: z.string().min(2, 'Brand/Type must be at least 2 characters'),
+  brand: z.string().min(2, 'Brand must be at least 2 characters'),
   model: z.string().min(1, 'Model is required'),
   category: z.string().min(2, 'Category must be at least 2 characters'),
 });
@@ -203,17 +205,62 @@ export async function checkReminders() {
         e.borrowedUntil &&
         !e.reminderSent
     );
-
+    let shouldRevalidate = false;
     for (const item of borrowedItems) {
       if (!item.borrowedUntil) continue;
-      const borrowedUntilDate = startOfDay(item.borrowedUntil);
+      const borrowedUntilDate = startOfDay(new Date(item.borrowedUntil));
       
       if (borrowedUntilDate <= twoDaysFromNow) {
         console.log(`Follow up triggered for ${item.name}. Due on: ${borrowedUntilDate.toDateString()}`);
         await updateEquipment(item.id, { status: 'Follow Up', reminderSent: true });
+        shouldRevalidate = true;
       }
+    }
+     if (shouldRevalidate) {
+      console.log('Follow up check complete. Paths revalidated.');
+    } else {
+      console.log('Follow up check complete. No new reminders.');
     }
   } catch (error) {
     console.error("Error checking for follow ups:", error);
+  }
+}
+
+export type LoginState = {
+  message: string;
+  success: boolean;
+};
+
+export async function signInWithEmail(prevState: LoginState, formData: FormData): Promise<LoginState> {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!email || !password) {
+    return { message: 'Email and password are required.', success: false };
+  }
+
+  try {
+    // This doesn't actually sign the user in on the server,
+    // but verifies the credentials. The client-side handles the actual sign-in state.
+    // This is a common pattern for Next.js Server Actions with client-side auth libraries.
+    await signInWithEmailAndPassword(auth, email, password);
+    return { message: 'Login successful!', success: true };
+  } catch (error: any) {
+    let errorMessage = 'An unknown error occurred.';
+    switch (error.code) {
+      case 'auth/user-not-found':
+      case 'auth/wrong-password':
+      case 'auth/invalid-credential':
+        errorMessage = 'Invalid email or password.';
+        break;
+      case 'auth/invalid-email':
+        errorMessage = 'Please enter a valid email address.';
+        break;
+      default:
+        errorMessage = 'Failed to login. Please try again later.';
+        break;
+    }
+    console.error('Firebase Auth Error:', error.code, error.message);
+    return { message: errorMessage, success: false };
   }
 }
