@@ -15,6 +15,7 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 const protectedRoutes = ['/history', '/qr-codes', '/equipment/new'];
+const publicRoutes = ['/']; // The root is now public and handles login/dashboard display
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -33,11 +34,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    // If the route is protected and there's no user, redirect to the root.
-    // The root page will then show the login form.
-    if (!user && protectedRoutes.includes(pathname)) {
+    const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
+
+    // If there's no user and they are trying to access a protected route,
+    // redirect them to the home page which will show the login form.
+    if (!user && isProtectedRoute) {
       router.push('/');
     }
+
   }, [user, loading, pathname, router]);
 
 
