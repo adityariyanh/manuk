@@ -51,13 +51,13 @@ export default async function DashboardPage() {
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
         {equipment.length > 0 ? (
-          <div className="border rounded-lg overflow-x-auto">
+          <div className="border rounded-lg">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[150px] md:min-w-[200px]">Name</TableHead>
+                  <TableHead>Name</TableHead>
                   <TableHead className="hidden sm:table-cell">Status</TableHead>
-                  <TableHead className="w-[120px] md:w-[220px] text-right">
+                  <TableHead className="text-right">
                     Actions
                   </TableHead>
                 </TableRow>
