@@ -4,19 +4,21 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/com
 import Image from 'next/image';
 import { useEffect, useState } from 'react';
 import { Skeleton } from './ui/skeleton';
+import nextConfig from '../../next.config';
 
 export function QrCodeCard({ equipmentId }: { equipmentId: string }) {
   const [qrCodeUrl, setQrCodeUrl] = useState('');
+  const basePath = nextConfig.basePath || '';
 
   useEffect(() => {
     // The QR code now points to the dedicated action URL
-    const url = `${window.location.origin}/equipment/${equipmentId}/action`;
+    const url = `${window.location.origin}${basePath}/equipment/${equipmentId}/action`;
     setQrCodeUrl(
       `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(
         url
       )}&qzone=1`
     );
-  }, [equipmentId]);
+  }, [equipmentId, basePath]);
 
   return (
     <Card>
