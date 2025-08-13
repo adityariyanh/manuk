@@ -13,6 +13,7 @@ const roboto = Roboto({
 export const metadata: Metadata = {
   title: 'MANUK',
   description: 'Equipment Management System',
+  icons: null,
 };
 
 export default function RootLayout({
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${roboto.variable} font-body antialiased`}>
-        <AppShell>{children}</AppShell>
+        <AppShell>
+          <main>{children}</main>
+        </AppShell>
         <Toaster />
       </body>
     </html>

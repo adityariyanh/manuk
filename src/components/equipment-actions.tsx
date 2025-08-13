@@ -3,6 +3,12 @@
 import {
   AlertDialog,
   AlertDialogContent,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogCancel,
+  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -12,22 +18,23 @@ import {
   markAsRepaired,
 } from '@/lib/actions';
 import type { Equipment } from '@/lib/types';
-import {
-  Loader2,
-  Wrench,
-  CheckCircle,
-} from 'lucide-react';
-import { useEffect, useActionState, useRef } from 'react';
+import { Loader2, Wrench, CheckCircle } from 'lucide-react';
+import { useEffect, useActionState, useRef, useState } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
-import { AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from './ui/alert-dialog';
 
-function RepairForm({ equipmentId, closeDialog }: { equipmentId: string, closeDialog: () => void }) {
+function RepairForm({
+  equipmentId,
+  closeDialog,
+}: {
+  equipmentId: string;
+  closeDialog: () => void;
+}) {
   const { toast } = useToast();
   const formRef = useRef<HTMLFormElement>(null);
-  
+
   const initialRepairState: RepairState = { message: '' };
   const [repairState, repairDispatch] = useActionState(
     reportForRepair,
@@ -95,7 +102,6 @@ function RepairForm({ equipmentId, closeDialog }: { equipmentId: string, closeDi
   );
 }
 
-
 export function EquipmentActions({ equipment }: { equipment: Equipment }) {
   const { toast } = useToast();
   const [isRepairing, startRepairTransition] = useActionState(async () => {
@@ -111,15 +117,13 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
     }
   }, undefined);
 
-  const [isDialogOpen, setDialogOpen] =
-    useActionState<boolean>( (prevState, _: FormData) => !prevState, false);
-
+  const [isDialogOpen, setDialogOpen] = useState(false);
 
   return (
     <div className="flex flex-wrap gap-2">
       {equipment.status === 'Under Repair' && (
         <form action={startRepairTransition}>
-          <Button type="submit" disabled={isRepairing}>
+          <Button type="submit" disabled={!!isRepairing}>
             {isRepairing ? (
               <Loader2 className="mr-2 animate-spin" />
             ) : (
@@ -132,14 +136,17 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
 
       {equipment.status !== 'Under Repair' && (
         <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-          <AlertDialog.Trigger asChild>
+          <AlertDialogTrigger asChild>
             <Button variant="destructive">
               <Wrench className="mr-2" />
               Report for Repair
             </Button>
-          </AlertDialog.Trigger>
+          </AlertDialogTrigger>
           <AlertDialogContent>
-             <RepairForm equipmentId={equipment.id} closeDialog={() => setDialogOpen(new FormData())} />
+            <RepairForm
+              equipmentId={equipment.id}
+              closeDialog={() => setDialogOpen(false)}
+            />
           </AlertDialogContent>
         </AlertDialog>
       )}
