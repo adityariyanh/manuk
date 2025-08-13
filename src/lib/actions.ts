@@ -1,3 +1,4 @@
+
 'use server';
 
 import { revalidatePath } from 'next/cache';
@@ -204,15 +205,15 @@ export async function checkReminders() {
     for (const item of borrowedItems) {
       const borrowedUntilDate = item.borrowedUntil;
       if (borrowedUntilDate && new Date(borrowedUntilDate) <= twoDaysFromNow) {
-        console.log(`Reminder triggered for ${item.name}. Due on: ${borrowedUntilDate.toDateString()}`);
-        await updateEquipment(item.id, { status: 'Reminder', reminderSent: true });
+        console.log(`Follow up triggered for ${item.name}. Due on: ${borrowedUntilDate.toDateString()}`);
+        await updateEquipment(item.id, { status: 'Follow Up', reminderSent: true });
         revalidatePath('/');
         revalidatePath(`/equipment/${item.id}`);
       }
     }
      revalidatePath('/');
-     console.log('Reminder check complete.');
+     console.log('Follow up check complete.');
   } catch (error) {
-      console.error("Error checking reminders:", error);
+      console.error("Error checking for follow ups:", error);
   }
 }

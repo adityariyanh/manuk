@@ -1,3 +1,4 @@
+
 import { getEquipmentById, getLogsForEquipment, getAllEquipment } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import {
@@ -30,8 +31,8 @@ function StatusBadge({ status }: { status: EquipmentStatus }) {
       ? 'secondary'
       : 'destructive';
 
-   if (status === 'Reminder') {
-     return <Badge variant='destructive'>Due Soon</Badge>;
+   if (status === 'Follow Up') {
+     return <Badge variant='destructive'>Follow Up</Badge>;
    }
 
   return <Badge variant={variant}>{status}</Badge>;
@@ -66,7 +67,7 @@ export default async function EquipmentDetailsPage({
                 <span className="text-muted-foreground">Status</span>
                 <StatusBadge status={equipment.status} />
               </div>
-              {(equipment.status === 'Borrowed' || equipment.status === 'Reminder') && equipment.borrowedBy && (
+              {(equipment.status === 'Borrowed' || equipment.status === 'Follow Up') && equipment.borrowedBy && (
                  <>
                   <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Borrowed By</span>

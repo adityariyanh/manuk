@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -287,7 +288,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
           </AlertDialog>
         );
       case 'Borrowed':
-      case 'Reminder':
+      case 'Follow Up':
         return (
           <Button size="sm" onClick={handleCheckin} disabled={isPending}>
             {isPending && <Loader2 className="mr-2 animate-spin" />}

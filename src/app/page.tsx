@@ -23,8 +23,8 @@ function StatusBadge({ status }: { status: EquipmentStatus }) {
       ? 'secondary'
       : 'destructive';
 
-  if (status === 'Reminder') {
-     return <Badge variant='destructive'>Due Soon</Badge>;
+  if (status === 'Follow Up') {
+     return <Badge variant='destructive'>Follow Up</Badge>;
   }
 
   return <Badge variant={variant}>{status}</Badge>;
