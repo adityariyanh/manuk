@@ -38,17 +38,25 @@ const prompt = ai.definePrompt({
   output: {schema: SuggestReplacementEquipmentOutputSchema},
   prompt: `You are an AI assistant that suggests replacement equipment based on historical borrowing patterns.
 
-  Given the following information about a broken piece of equipment, the role of the user, and historical borrowing data, suggest a list of suitable replacement equipment.
+Your goal is to suggest a list of suitable replacement equipment when a piece of equipment is reported as broken.
 
-  Broken Equipment Name: {{{brokenEquipmentName}}}
-  User Role: {{{userRole}}}
-  Historical Borrowing Data: {{{historicalBorrowingData}}}
+Analyze the provided information: the name of the broken equipment, the role of the user requesting the replacement, and the historical borrowing data. Your suggestions should be tailored to the user's role and reflect common borrowing patterns.
 
-  Consider the user's role and historical borrowing patterns to suggest the most appropriate replacement equipment.
-  Explain your reasoning for suggesting the equipment.
+ALWAYS respond with a valid JSON object that strictly follows this format:
+{
+  "suggestedEquipment": ["<suggestion1>", "<suggestion2>", ...],
+  "reasoning": "<Your detailed explanation here>"
+}
 
-  Format your response as a JSON object with \"suggestedEquipment\" (a list of equipment names) and \"reasoning\" fields.
-  `,
+Do not include any text or formatting outside of this JSON object.
+
+Here is the information for the current request:
+
+Broken Equipment Name: {{{brokenEquipmentName}}}
+User Role: {{{userRole}}}
+Historical Borrowing Data:
+{{{historicalBorrowingData}}}
+`,
 });
 
 const suggestReplacementEquipmentFlow = ai.defineFlow(
