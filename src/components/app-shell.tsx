@@ -11,9 +11,8 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { Home, PlusCircle, Package } from 'lucide-react';
+import { Home, PlusCircle, Package, History } from 'lucide-react';
 import { usePathname } from 'next/navigation';
-import { Logo } from './icons';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -21,6 +20,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const menuItems = [
     { href: '/', label: 'Dashboard', icon: Home },
     { href: '/equipment/new', label: 'Add Equipment', icon: PlusCircle },
+    { href: '/history', label: 'History', icon: History },
   ];
 
   return (

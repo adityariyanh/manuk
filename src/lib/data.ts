@@ -42,6 +42,9 @@ let logStore: LogEntry[] = [
   { id: 'l6', equipmentId: '4', action: 'Registered', timestamp: new Date('2023-05-10') },
   { id: 'l7', equipmentId: '1', action: 'Borrowed', user: 'Bob', timestamp: new Date('2024-03-01') },
   { id: 'l8', equipmentId: '1', action: 'Returned', user: 'Bob', timestamp: new Date('2024-03-05') },
+  { id: 'l9', equipmentId: '4', action: 'Borrowed', user: 'Charlie', timestamp: new Date('2024-05-01') },
+  { id: 'l10', equipmentId: '4', action: 'Returned', user: 'Charlie', timestamp: new Date('2024-05-05') },
+  { id: 'l11', equipmentId: '1', action: 'Borrowed', user: 'David', timestamp: new Date('2024-05-12') },
 ];
 
 // Data access functions
@@ -55,6 +58,10 @@ export async function getEquipmentById(id: string): Promise<Equipment | undefine
 
 export async function getLogsForEquipment(equipmentId: string): Promise<LogEntry[]> {
   return Promise.resolve(logStore.filter((l) => l.equipmentId === equipmentId).sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()));
+}
+
+export async function getAllLogs(): Promise<LogEntry[]> {
+    return Promise.resolve(logStore.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime()));
 }
 
 export async function addEquipment(equipment: Omit<Equipment, 'id' | 'status'>): Promise<Equipment> {

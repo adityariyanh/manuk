@@ -42,6 +42,7 @@ export async function registerEquipment(
     const newEquipment = await addEquipment(validatedFields.data);
     await addLog({ equipmentId: newEquipment.id, action: 'Registered' });
     revalidatePath('/');
+    revalidatePath('/history');
     redirect(`/equipment/${newEquipment.id}`);
   } catch (error) {
     return {
@@ -56,6 +57,7 @@ export async function checkoutEquipment(equipmentId: string, user: string) {
     await addLog({ equipmentId, action: 'Borrowed', user });
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
+    revalidatePath('/history');
     return { success: true, message: 'Equipment checked out successfully.' };
   } catch (error) {
     return { success: false, message: 'Failed to checkout equipment.' };
@@ -71,6 +73,7 @@ export async function checkinEquipment(equipmentId: string) {
     await updateEquipment(equipmentId, { status: 'Available', borrowedBy: undefined });
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
+    revalidatePath('/history');
     return { success: true, message: 'Equipment checked in successfully.' };
   } catch (error) {
     return { success: false, message: 'Failed to checkin equipment.' };
@@ -83,6 +86,7 @@ export async function markAsRepaired(equipmentId: string) {
     await addLog({ equipmentId, action: 'Repaired', user: 'Admin' });
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
+    revalidatePath('/history');
     return { success: true, message: 'Equipment marked as repaired.' };
   } catch (error) {
     return { success: false, message: 'Failed to mark equipment as repaired.' };
@@ -126,6 +130,7 @@ export async function reportForRepair(
 
         revalidatePath('/');
         revalidatePath(`/equipment/${equipmentId}`);
+        revalidatePath('/history');
         
         return { message: "Successfully reported for repair and got suggestions.", suggestions };
 
