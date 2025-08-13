@@ -1,6 +1,7 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useFormStatus } from 'react-dom';
+import { useActionState } from 'react';
 import { registerEquipment, type FormState } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -25,7 +26,7 @@ function SubmitButton() {
 
 export function EquipmentForm() {
   const initialState: FormState = { message: '', errors: {} };
-  const [state, dispatch] = useFormState(registerEquipment, initialState);
+  const [state, dispatch] = useActionState(registerEquipment, initialState);
   const [date, setDate] = useState<Date | undefined>();
   const { toast } = useToast();
 

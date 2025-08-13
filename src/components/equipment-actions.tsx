@@ -29,8 +29,8 @@ import {
   Wrench,
   Lightbulb,
 } from 'lucide-react';
-import { useState, useTransition, useEffect } from 'react';
-import { useFormState, useFormStatus } from 'react-dom';
+import { useState, useTransition, useEffect, useActionState } from 'react';
+import { useFormStatus } from 'react-dom';
 import { Textarea } from './ui/textarea';
 import {
   Select,
@@ -97,7 +97,7 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
   const [isSuggestionOpen, setSuggestionOpen] = useState(false);
 
   const initialRepairState: RepairState = { message: '' };
-  const [repairState, repairDispatch] = useFormState(
+  const [repairState, repairDispatch] = useActionState(
     reportForRepair,
     initialRepairState
   );
