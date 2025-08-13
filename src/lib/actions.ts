@@ -8,7 +8,6 @@ import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from './firebase';
-import { redirect } from 'next/navigation';
 
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
@@ -50,6 +49,9 @@ export async function registerEquipment(
   try {
     const newEquipment = await addEquipment(validatedFields.data);
     await addLog({ equipmentId: newEquipment.id, action: 'Registered' });
+    revalidatePath('/');
+    revalidatePath('/history');
+    revalidatePath('/equipment/new');
   } catch (error) {
     const message = error instanceof Error ? error.message : 'An unknown error occurred';
     console.error('Database Error:', error);
@@ -59,9 +61,6 @@ export async function registerEquipment(
     };
   }
 
-  revalidatePath('/');
-  revalidatePath('/history');
-  revalidatePath('/equipment/new');
   return { message: `Successfully added "${validatedFields.data.name}".`, success: true };
 }
 
@@ -206,7 +205,7 @@ export async function checkReminders() {
         e.borrowedUntil &&
         !e.reminderSent
     );
-    let shouldRevalidate = false;
+
     for (const item of borrowedItems) {
       if (!item.borrowedUntil) continue;
       const borrowedUntilDate = startOfDay(new Date(item.borrowedUntil));
@@ -214,13 +213,7 @@ export async function checkReminders() {
       if (borrowedUntilDate <= twoDaysFromNow) {
         console.log(`Follow up triggered for ${item.name}. Due on: ${borrowedUntilDate.toDateString()}`);
         await updateEquipment(item.id, { status: 'Follow Up', reminderSent: true });
-        shouldRevalidate = true;
       }
-    }
-     if (shouldRevalidate) {
-      console.log('Follow up check complete. Paths revalidated.');
-    } else {
-      console.log('Follow up check complete. No new reminders.');
     }
   } catch (error) {
     console.error("Error checking for follow ups:", error);

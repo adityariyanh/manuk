@@ -45,7 +45,7 @@ import { Checkbox } from './ui/checkbox';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar } from './ui/calendar';
 
-export function DashboardActions({ equipment }: { equipment: Equipment }) {
+export function DashboardActions({ equipment, onActionSuccess }: { equipment: Equipment, onActionSuccess: () => void }) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
 
@@ -85,13 +85,13 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
       );
       if (result.success) {
         toast({ title: 'Success', description: result.message });
-        // Reset form and close modal
         setBorrowerName('');
         setPlace('');
         setBorrowerPhone('');
         setDescription('');
         setIsOneDayCheckout(true);
         setModalOpen(false);
+        onActionSuccess();
       } else {
         toast({
           variant: 'destructive',
@@ -107,6 +107,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
       const result = await checkinEquipment(equipment.id);
       if (result.success) {
         toast({ title: 'Success', description: result.message });
+        onActionSuccess();
       } else {
         toast({
           variant: 'destructive',
@@ -122,6 +123,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
       const result = await markAsRepaired(equipment.id);
       if (result.success) {
         toast({ title: 'Success', description: result.message });
+        onActionSuccess();
       } else {
         toast({
           variant: 'destructive',
@@ -137,6 +139,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
       const result = await deleteEquipment(equipment.id);
       if (result.success) {
         toast({ title: 'Success', description: result.message });
+        onActionSuccess();
       } else {
         toast({
           variant: 'destructive',

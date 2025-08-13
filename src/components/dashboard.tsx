@@ -1,4 +1,4 @@
-'use server';
+'use client';
 
 import {
   Table,
@@ -11,11 +11,13 @@ import {
 import { getAllEquipment } from '@/lib/data';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import type { EquipmentStatus } from '@/lib/types';
-import { Package } from 'lucide-react';
+import type { Equipment, EquipmentStatus } from '@/lib/types';
+import { Package, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DashboardActions } from '@/components/dashboard-actions';
 import { checkReminders } from '@/lib/actions';
+import { useEffect, useState } from 'react';
+import { useToast } from '@/hooks/use-toast';
 
 function StatusBadge({ status }: { status: EquipmentStatus }) {
   const variant: 'default' | 'secondary' | 'destructive' =
@@ -26,26 +28,58 @@ function StatusBadge({ status }: { status: EquipmentStatus }) {
       : 'destructive';
 
   if (status === 'Follow Up') {
-     return <Badge variant='destructive'>Follow Up</Badge>;
+    return <Badge variant="destructive">Follow Up</Badge>;
   }
 
   return <Badge variant={variant}>{status}</Badge>;
 }
 
-export async function Dashboard() {
-  await checkReminders();
-  const equipment = await getAllEquipment();
+export function Dashboard() {
+  const [equipment, setEquipment] = useState<Equipment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
+
+  const fetchData = async () => {
+    try {
+      setLoading(true);
+      await checkReminders();
+      const data = await getAllEquipment();
+      setEquipment(data);
+    } catch (error) {
+      toast({
+        variant: 'destructive',
+        title: 'Error',
+        description: 'Failed to load dashboard data.',
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchData();
+  }, [toast]);
+
+  if (loading) {
+    return (
+       <div className="flex items-center justify-center h-full">
+         <Loader2 className="w-12 h-12 animate-spin" />
+       </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full">
-       <header className="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+      <header className="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold font-headline">
             Equipment Dashboard
           </h1>
-          <p className="text-muted-foreground">An overview of all equipment in the inventory.</p>
+          <p className="text-muted-foreground">
+            An overview of all equipment in the inventory.
+          </p>
         </div>
-         <Button asChild>
+        <Button asChild>
           <Link href="/equipment/new">Add Equipment</Link>
         </Button>
       </header>
@@ -56,8 +90,12 @@ export async function Dashboard() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="w-[40%] lg:w-[35%]">Name</TableHead>
-                  <TableHead className="hidden lg:table-cell lg:w-[25%]">Model</TableHead>
-                  <TableHead className="hidden sm:table-cell w-[20%] lg:w-[15%]">Status</TableHead>
+                  <TableHead className="hidden lg:table-cell lg:w-[25%]">
+                    Model
+                  </TableHead>
+                  <TableHead className="hidden sm:table-cell w-[20%] lg:w-[15%]">
+                    Status
+                  </TableHead>
                   <TableHead className="text-right w-[30%] lg:w-[25%]">
                     Actions
                   </TableHead>
@@ -68,17 +106,21 @@ export async function Dashboard() {
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">
                       <div className="font-medium truncate">{item.name}</div>
-                      <div className="text-sm text-muted-foreground lg:hidden">{item.brand} - {item.model}</div>
-                       <div className="sm:hidden mt-2">
+                      <div className="text-sm text-muted-foreground lg:hidden">
+                        {item.brand} - {item.model}
+                      </div>
+                      <div className="sm:hidden mt-2">
                         <StatusBadge status={item.status} />
                       </div>
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell truncate">{item.model}</TableCell>
+                    <TableCell className="hidden lg:table-cell truncate">
+                      {item.model}
+                    </TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <StatusBadge status={item.status} />
                     </TableCell>
                     <TableCell className="text-right">
-                      <DashboardActions equipment={item} />
+                      <DashboardActions equipment={item} onActionSuccess={fetchData} />
                     </TableCell>
                   </TableRow>
                 ))}
