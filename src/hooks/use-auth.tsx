@@ -37,16 +37,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const isPublic = publicRoutes.includes(pathname) || equipmentRoutesPattern.test(pathname);
 
-    // If user is not logged in and is trying to access a protected route, redirect to login
+    // If auth state is loaded, there is no user, and they are on a protected route,
+    // redirect them to the login page.
     if (!user && !isPublic) {
       router.push('/login');
     }
     
-    // If user is logged in and on the login page, redirect to dashboard
-    if (user && pathname === '/login') {
-      router.push('/');
-    }
-
   }, [user, loading, pathname, router]);
 
   const logout = async () => {

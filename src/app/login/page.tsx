@@ -34,7 +34,8 @@ export default function LoginPage() {
 
 
   useEffect(() => {
-    // If the user is already logged in, redirect them to the dashboard.
+    // If the user is already logged in (e.g. from a previous session or after a successful login), 
+    // redirect them to the dashboard.
     if (user) {
       router.push('/');
     }
@@ -48,8 +49,8 @@ export default function LoginPage() {
         title: 'Success!',
         description: state.message,
       });
-      // The redirect is now handled by the main AuthProvider/hook
-      // which waits for the auth state to be confirmed.
+      // The redirect is now handled by the effect above, which waits for the 
+      // auth state to be confirmed on the client.
     } else if (state.message) {
       toast({
         variant: "destructive",
@@ -57,7 +58,7 @@ export default function LoginPage() {
         description: state.message,
       });
     }
-  }, [state, toast]);
+  }, [state, toast, router]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted">
