@@ -35,12 +35,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   useEffect(() => {
     if (loading) return;
 
-    const isPublic = publicRoutes.includes(pathname);
-    const isEquipmentRoute = equipmentRoutesPattern.test(pathname);
+    const isPublic = publicRoutes.includes(pathname) || equipmentRoutesPattern.test(pathname);
 
-    if (!user && !isPublic && !isEquipmentRoute) {
+    // If user is not logged in and is trying to access a protected route, redirect to login
+    if (!user && !isPublic) {
       router.push('/login');
     }
+    
+    // If user is logged in and on the login page, redirect to dashboard
+    if (user && pathname === '/login') {
+      router.push('/');
+    }
+
   }, [user, loading, pathname, router]);
 
   const logout = async () => {
@@ -50,9 +56,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const value = { user, loading, logout };
   
-  const isPublic = publicRoutes.includes(pathname);
-  const isEquipmentRoute = equipmentRoutesPattern.test(pathname);
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -61,14 +64,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     );
   }
   
-  if (!user && !isPublic && !isEquipmentRoute) {
-     return (
-      <div className="flex items-center justify-center h-screen">
-        <Loader2 className="w-12 h-12 animate-spin" />
-      </div>
-    );
-  }
-
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

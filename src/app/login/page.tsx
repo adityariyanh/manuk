@@ -11,6 +11,7 @@ import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { type LoginState, signInWithEmail } from '@/lib/actions';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '@/hooks/use-auth';
 
 
 function SubmitButton() {
@@ -29,15 +30,26 @@ export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
+  const { user } = useAuth();
 
 
   useEffect(() => {
+    // If the user is already logged in, redirect them to the dashboard.
+    if (user) {
+      router.push('/');
+    }
+  }, [user, router]);
+
+
+  useEffect(() => {
+    // This effect handles the result of the form submission
     if (state.success) {
       toast({
         title: 'Success!',
         description: state.message,
       });
-      router.push('/');
+      // The redirect is now handled by the main AuthProvider/hook
+      // which waits for the auth state to be confirmed.
     } else if (state.message) {
       toast({
         variant: "destructive",
@@ -45,7 +57,7 @@ export default function LoginPage() {
         description: state.message,
       });
     }
-  }, [state, toast, router]);
+  }, [state, toast]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted">
