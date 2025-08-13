@@ -3,10 +3,18 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getAllEquipment, getEquipmentById, updateEquipment, deleteField } from './data';
+import {
+  addEquipment,
+  addLog,
+  deleteEquipment as deleteEquipmentData,
+  getAllEquipment,
+  getEquipmentById,
+  updateEquipment,
+  deleteField,
+  batchAddEquipment,
+} from './data';
 import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
-
 
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
@@ -52,7 +60,8 @@ export async function registerEquipment(
     revalidatePath('/history');
     revalidatePath('/equipment/new');
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'An unknown error occurred';
+    const message =
+      error instanceof Error ? error.message : 'An unknown error occurred';
     console.error('Database Error:', error);
     return {
       message: `Database Error: Failed to create equipment. ${message}`,
@@ -60,8 +69,47 @@ export async function registerEquipment(
     };
   }
 
-  return { message: `Successfully added "${validatedFields.data.name}".`, success: true };
+  return {
+    message: `Successfully added "${validatedFields.data.name}".`,
+    success: true,
+  };
 }
+
+const bulkEquipmentSchema = z.array(equipmentSchema);
+
+export async function bulkRegisterEquipment(equipmentData: unknown) {
+  const validatedFields = bulkEquipmentSchema.safeParse(equipmentData);
+
+  if (!validatedFields.success) {
+    console.error(validatedFields.error.flatten());
+    return {
+      success: false,
+      message: 'Data validation failed. Please check the file format and content.',
+      errors: validatedFields.error.flatten().fieldErrors,
+    };
+  }
+
+  try {
+    await batchAddEquipment(validatedFields.data);
+    revalidatePath('/');
+    revalidatePath('/history');
+    revalidatePath('/equipment/new');
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'An unknown error occurred';
+    console.error('Bulk Add Database Error:', error);
+    return {
+      success: false,
+      message: `Database Error: Failed to add equipment in bulk. ${message}`,
+    };
+  }
+    
+  return {
+    success: true,
+    message: `Successfully added ${validatedFields.data.length} equipment items.`,
+  };
+}
+
 
 export async function checkoutEquipment(
   equipmentId: string,
@@ -70,12 +118,12 @@ export async function checkoutEquipment(
   description: string,
   phone?: string,
   borrowedFrom?: Date,
-  borrowedUntil?: Date,
+  borrowedUntil?: Date
 ) {
   try {
     const notes = `Place: ${place}. Purpose: ${description}.`;
-    const updateData: Partial<Equipment> = { 
-      status: 'Borrowed', 
+    const updateData: Partial<Equipment> = {
+      status: 'Borrowed',
       borrowedBy: user,
       borrowedFrom: borrowedFrom || new Date(),
       borrowedUntil: borrowedUntil || addDays(new Date(), 1),
@@ -85,7 +133,7 @@ export async function checkoutEquipment(
     if (phone) {
       updateData.borrowerPhone = phone;
     }
-    
+
     await updateEquipment(equipmentId, updateData);
     await addLog({ equipmentId, action: 'Borrowed', user, notes });
 
@@ -95,7 +143,10 @@ export async function checkoutEquipment(
     return { success: true, message: 'Equipment checked out successfully.' };
   } catch (error) {
     console.error('Checkout Error:', error);
-    const message = error instanceof Error ? error.message : 'Failed to checkout equipment.';
+    const message =
+      error instanceof Error
+        ? error.message
+        : 'Failed to checkout equipment.';
     return { success: false, message };
   }
 }
@@ -104,11 +155,15 @@ export async function checkinEquipment(equipmentId: string) {
   try {
     const equipment = await getEquipmentById(equipmentId);
     if (equipment) {
-      await addLog({ equipmentId, action: 'Returned', user: equipment.borrowedBy });
+      await addLog({
+        equipmentId,
+        action: 'Returned',
+        user: equipment.borrowedBy,
+      });
     }
-    
-    await updateEquipment(equipmentId, { 
-      status: 'Available', 
+
+    await updateEquipment(equipmentId, {
+      status: 'Available',
       borrowedBy: null,
       borrowerPhone: null,
       borrowedFrom: null,
@@ -120,7 +175,8 @@ export async function checkinEquipment(equipmentId: string) {
     revalidatePath('/history');
     return { success: true, message: 'Equipment checked in successfully.' };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to checkin equipment.';
+    const message =
+      error instanceof Error ? error.message : 'Failed to checkin equipment.';
     return { success: false, message };
   }
 }
@@ -134,7 +190,8 @@ export async function markAsRepaired(equipmentId: string) {
     revalidatePath('/history');
     return { success: true, message: 'Equipment marked as repaired.' };
   } catch (error) {
-    const message = error instanceof Error ? error.message : 'Failed to mark as repaired.';
+    const message =
+      error instanceof Error ? error.message : 'Failed to mark as repaired.';
     return { success: false, message };
   }
 }
@@ -143,53 +200,65 @@ export type RepairState = {
   message: string;
   error?: string;
   success?: boolean;
-}
+};
 
 export async function reportForRepair(
-  formData: FormData,
+  formData: FormData
 ): Promise<RepairState> {
-    const equipmentId = formData.get('equipmentId') as string;
-    const userName = formData.get('userName') as string;
-    const problem = formData.get('problem') as string;
+  const equipmentId = formData.get('equipmentId') as string;
+  const userName = formData.get('userName') as string;
+  const problem = formData.get('problem') as string;
 
-    if(!equipmentId || !userName || !problem) {
-        return { message: "Invalid input", error: "Missing required fields.", success: false };
+  if (!equipmentId || !userName || !problem) {
+    return {
+      message: 'Invalid input',
+      error: 'Missing required fields.',
+      success: false,
+    };
+  }
+
+  try {
+    const equipment = await getEquipmentById(equipmentId);
+    if (!equipment) {
+      return {
+        message: 'Equipment not found',
+        error: 'The specified equipment does not exist.',
+        success: false,
+      };
     }
 
-    try {
-        const equipment = await getEquipmentById(equipmentId);
-        if (!equipment) {
-            return { message: "Equipment not found", error: "The specified equipment does not exist.", success: false };
-        }
+    await updateEquipment(equipmentId, { status: 'Under Repair' });
+    await addLog({
+      equipmentId,
+      action: 'Reported for Repair',
+      user: userName,
+      notes: problem,
+    });
 
-        await updateEquipment(equipmentId, { status: 'Under Repair' });
-        await addLog({ equipmentId, action: 'Reported for Repair', user: userName, notes: problem });
+    revalidatePath('/');
+    revalidatePath(`/equipment/${equipmentId}`);
+    revalidatePath('/history');
 
-        revalidatePath('/');
-        revalidatePath(`/equipment/${equipmentId}`);
-        revalidatePath('/history');
-        
-        return { message: "Successfully reported for repair.", success: true };
-
-    } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : String(error);
-        console.error("Report for Repair Error:", errorMessage);
-        return { message: "An error occurred", error: errorMessage, success: false };
-    }
+    return { message: 'Successfully reported for repair.', success: true };
+  } catch (error) {
+    const errorMessage = error instanceof Error ? error.message : String(error);
+    console.error('Report for Repair Error:', errorMessage);
+    return { message: 'An error occurred', error: errorMessage, success: false };
+  }
 }
 
 export async function deleteEquipment(equipmentId: string) {
-    try {
-        await deleteEquipmentData(equipmentId);
-        revalidatePath('/');
-        revalidatePath('/history');
-        return { success: true, message: 'Equipment deleted successfully.' };
-    } catch (error) {
-        const message = error instanceof Error ? error.message : 'Failed to delete equipment.';
-        return { success: false, message };
-    }
+  try {
+    await deleteEquipmentData(equipmentId);
+    revalidatePath('/');
+    revalidatePath('/history');
+    return { success: true, message: 'Equipment deleted successfully.' };
+  } catch (error) {
+    const message =
+      error instanceof Error ? error.message : 'Failed to delete equipment.';
+    return { success: false, message };
+  }
 }
-
 
 export async function checkReminders() {
   console.log('Checking for reminders...');
@@ -208,13 +277,20 @@ export async function checkReminders() {
     for (const item of borrowedItems) {
       if (!item.borrowedUntil) continue;
       const borrowedUntilDate = startOfDay(new Date(item.borrowedUntil));
-      
+
       if (borrowedUntilDate <= twoDaysFromNow) {
-        console.log(`Follow up triggered for ${item.name}. Due on: ${borrowedUntilDate.toDateString()}`);
-        await updateEquipment(item.id, { status: 'Follow Up', reminderSent: true });
+        console.log(
+          `Follow up triggered for ${
+            item.name
+          }. Due on: ${borrowedUntilDate.toDateString()}`
+        );
+        await updateEquipment(item.id, {
+          status: 'Follow Up',
+          reminderSent: true,
+        });
       }
     }
   } catch (error) {
-    console.error("Error checking for follow ups:", error);
+    console.error('Error checking for follow ups:', error);
   }
 }
