@@ -41,7 +41,10 @@ export function EquipmentForm() {
       });
       formRef.current?.reset();
       setDate(undefined);
-      router.push('/');
+      // We no longer need to manually redirect, revalidatePath will refresh the data
+      // and the user can choose to navigate away or add another item.
+      // A full redirect can be jarring. If you still want it, uncomment the line below.
+      // router.push('/');
     } else if (state.message && state.errors) {
         const errorFields = Object.keys(state.errors).join(', ');
         toast({
