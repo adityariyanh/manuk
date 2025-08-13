@@ -7,6 +7,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { checkinEquipment, checkoutEquipment } from '@/lib/actions';
 import Link from 'next/link';
+import { Textarea } from '@/components/ui/textarea';
 
 export default async function EquipmentActionPage({
   params,
@@ -22,8 +23,10 @@ export default async function EquipmentActionPage({
   async function handleCheckout(formData: FormData) {
     'use server';
     const borrowerName = formData.get('borrowerName') as string;
+    const place = formData.get('place') as string;
+    const description = formData.get('description') as string;
     if (borrowerName) {
-      await checkoutEquipment(params.id, borrowerName);
+      await checkoutEquipment(params.id, borrowerName, place, description);
       redirect(`/equipment/${params.id}`);
     }
   }
@@ -51,6 +54,24 @@ export default async function EquipmentActionPage({
                   id="borrowerName"
                   name="borrowerName"
                   placeholder="John Doe"
+                  required
+                />
+              </div>
+               <div className="space-y-2">
+                <Label htmlFor="place">Place</Label>
+                <Input
+                  id="place"
+                  name="place"
+                  placeholder="e.g. Room 201, Offsite Event"
+                  required
+                />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="description">Purpose/Description</Label>
+                <Textarea
+                  id="description"
+                  name="description"
+                  placeholder="Describe the purpose of borrowing this item..."
                   required
                 />
               </div>

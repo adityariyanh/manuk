@@ -56,10 +56,11 @@ export async function registerEquipment(
   return { message: `Successfully added "${validatedFields.data.name}".`, success: true };
 }
 
-export async function checkoutEquipment(equipmentId: string, user: string) {
+export async function checkoutEquipment(equipmentId: string, user: string, place: string, description: string) {
   try {
+    const notes = `Place: ${place}. Purpose: ${description}`;
     await updateEquipment(equipmentId, { status: 'Borrowed', borrowedBy: user });
-    await addLog({ equipmentId, action: 'Borrowed', user });
+    await addLog({ equipmentId, action: 'Borrowed', user, notes });
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
     revalidatePath('/history');
