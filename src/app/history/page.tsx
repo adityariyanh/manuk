@@ -79,7 +79,7 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       <header className="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold font-headline flex items-center gap-2">

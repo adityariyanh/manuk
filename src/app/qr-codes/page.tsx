@@ -98,7 +98,7 @@ export default function QrCodesPage() {
   };
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full overflow-hidden">
       <header className="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold font-headline flex items-center gap-2">
@@ -115,8 +115,7 @@ export default function QrCodesPage() {
         </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
-        <ScrollArea className="h-[calc(100vh-220px)]">
-          <div className="border rounded-lg overflow-x-auto">
+        <div className="border rounded-lg overflow-hidden">
             <Table>
               <TableHeader>
                 <TableRow>
@@ -163,7 +162,6 @@ export default function QrCodesPage() {
               </TableBody>
             </Table>
           </div>
-        </ScrollArea>
       </main>
     </div>
   );
