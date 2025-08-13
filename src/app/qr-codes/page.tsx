@@ -14,10 +14,15 @@ import type { Equipment } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { QrCode, Download } from 'lucide-react';
+import { QrCode, Download, Copy } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import * as XLSX from 'xlsx';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import getConfig from 'next/config';
+
+const { publicRuntimeConfig } = getConfig() || { publicRuntimeConfig: {} };
+const basePath = publicRuntimeConfig.basePath || '';
+
 
 export default function QrCodesPage() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -47,7 +52,7 @@ export default function QrCodesPage() {
 
   const getActionUrl = (equipmentId: string) => {
     if (!origin) return '';
-    return `${origin}/equipment/${equipmentId}/action`;
+    return `${origin}${basePath}/equipment/${equipmentId}/action`;
   };
 
   const copyToClipboard = (text: string) => {
@@ -115,9 +120,9 @@ export default function QrCodesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[150px] md:min-w-[200px]">Equipment Name</TableHead>
-                  <TableHead className="min-w-[250px] md:min-w-[300px]">QR Code Action URL</TableHead>
-                  <TableHead className="text-right w-[100px]">Copy</TableHead>
+                  <TableHead className="min-w-[150px]">Equipment Name</TableHead>
+                  <TableHead className="hidden md:table-cell min-w-[300px]">QR Code Action URL</TableHead>
+                  <TableHead className="text-right w-[100px]">Action</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -125,7 +130,7 @@ export default function QrCodesPage() {
                   Array.from({ length: 5 }).map((_, i) => (
                     <TableRow key={i}>
                       <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                      <TableCell className="hidden md:table-cell"><Skeleton className="h-5 w-full" /></TableCell>
                       <TableCell><Skeleton className="h-8 w-full" /></TableCell>
                     </TableRow>
                   ))
@@ -133,7 +138,7 @@ export default function QrCodesPage() {
                   equipment.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="font-mono text-sm max-w-xs md:max-w-sm lg:max-w-md truncate">
+                      <TableCell className="hidden md:table-cell font-mono text-sm max-w-sm truncate">
                         {getActionUrl(item.id)}
                       </TableCell>
                       <TableCell className="text-right">
@@ -142,7 +147,8 @@ export default function QrCodesPage() {
                           size="sm"
                           onClick={() => copyToClipboard(getActionUrl(item.id))}
                         >
-                          Copy
+                          <Copy className="md:mr-2" />
+                          <span className='hidden md:inline'>Copy</span>
                         </Button>
                       </TableCell>
                     </TableRow>
