@@ -81,7 +81,7 @@ export function EquipmentForm() {
                 />
               </PopoverContent>
             </Popover>
-            <input type="hidden" name="purchaseDate" value={date?.toISOString()} />
+            <input type="hidden" name="purchaseDate" value={date?.toISOString() || ''} />
             {state.errors?.purchaseDate && (
                 <p className="text-sm text-destructive">{state.errors.purchaseDate[0]}</p>
             )}
