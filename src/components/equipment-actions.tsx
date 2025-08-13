@@ -2,14 +2,7 @@
 
 import {
   AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
   AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -27,14 +20,9 @@ import {
 import { useEffect, useActionState, useRef } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Textarea } from './ui/textarea';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from './ui/select';
 import { Label } from './ui/label';
+import { Input } from './ui/input';
+import { AlertDialogHeader, AlertDialogTitle, AlertDialogDescription, AlertDialogFooter, AlertDialogCancel } from './ui/alert-dialog';
 
 function RepairForm({ equipmentId, closeDialog }: { equipmentId: string, closeDialog: () => void }) {
   const { toast } = useToast();
@@ -76,17 +64,14 @@ function RepairForm({ equipmentId, closeDialog }: { equipmentId: string, closeDi
       <div className="py-4 space-y-4">
         <input type="hidden" name="equipmentId" value={equipmentId} />
         <div className="space-y-2">
-          <Label htmlFor="userRole">Your Role</Label>
-          <Select name="userRole" required disabled={pending}>
-            <SelectTrigger>
-              <SelectValue placeholder="Select your role" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="student">Student</SelectItem>
-              <SelectItem value="teacher">Teacher</SelectItem>
-              <SelectItem value="staff">Staff</SelectItem>
-            </SelectContent>
-          </Select>
+          <Label htmlFor="userName">Your Name</Label>
+          <Input
+            id="userName"
+            name="userName"
+            placeholder="John Doe"
+            required
+            disabled={pending}
+          />
         </div>
         <div className="space-y-2">
           <Label htmlFor="problem">Problem Description</Label>
@@ -147,12 +132,12 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
 
       {equipment.status !== 'Under Repair' && (
         <AlertDialog open={isDialogOpen} onOpenChange={setDialogOpen}>
-          <AlertDialogTrigger asChild>
+          <AlertDialog.Trigger asChild>
             <Button variant="destructive">
               <Wrench className="mr-2" />
               Report for Repair
             </Button>
-          </AlertDialogTrigger>
+          </AlertDialog.Trigger>
           <AlertDialogContent>
              <RepairForm equipmentId={equipment.id} closeDialog={() => setDialogOpen(new FormData())} />
           </AlertDialogContent>

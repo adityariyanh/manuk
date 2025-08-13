@@ -113,10 +113,10 @@ export async function reportForRepair(
   formData: FormData,
 ): Promise<RepairState> {
     const equipmentId = formData.get('equipmentId') as string;
-    const userRole = formData.get('userRole') as string;
+    const userName = formData.get('userName') as string;
     const problem = formData.get('problem') as string;
 
-    if(!equipmentId || !userRole || !problem) {
+    if(!equipmentId || !userName || !problem) {
         return { message: "Invalid input", error: "Missing required fields.", success: false };
     }
 
@@ -127,7 +127,7 @@ export async function reportForRepair(
         }
 
         await updateEquipment(equipmentId, { status: 'Under Repair' });
-        await addLog({ equipmentId, action: 'Reported for Repair', user: userRole, notes: problem });
+        await addLog({ equipmentId, action: 'Reported for Repair', user: userName, notes: problem });
 
         revalidatePath('/');
         revalidatePath(`/equipment/${equipmentId}`);
