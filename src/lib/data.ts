@@ -11,6 +11,7 @@ import {
   Timestamp,
   orderBy,
   writeBatch,
+  deleteField,
 } from 'firebase/firestore';
 import { db } from './firebase';
 import type { Equipment, LogEntry, EquipmentStatus } from './types';
@@ -104,12 +105,20 @@ export async function updateEquipment(
   updates: Partial<Omit<Equipment, 'id'>>
 ): Promise<Equipment | undefined> {
   const docRef = doc(db, EQUIPMENT_COLLECTION, id);
-  // Convert Date objects to Firestore Timestamps before updating
-  const updatesWithTimestamps: { [key: string]: any } = { ...updates };
-  if (updates.borrowedUntil) {
-    updatesWithTimestamps.borrowedUntil = Timestamp.fromDate(updates.borrowedUntil);
+  // Convert values for Firestore
+  const updatesForFirestore: { [key: string]: any } = { ...updates };
+  
+  for (const key in updatesForFirestore) {
+    const value = updatesForFirestore[key];
+    if (value instanceof Date) {
+      updatesForFirestore[key] = Timestamp.fromDate(value);
+    } else if (value === null) {
+      // Use deleteField for null values to remove from document
+      updatesForFirestore[key] = deleteField();
+    }
   }
-  await updateDoc(docRef, updatesWithTimestamps);
+
+  await updateDoc(docRef, updatesForFirestore);
   return getEquipmentById(id);
 }
 

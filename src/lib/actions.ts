@@ -4,6 +4,7 @@ import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getAllEquipment, getEquipmentById, updateEquipment } from './data';
 import { addDays } from 'date-fns';
+import type { Equipment } from './types';
 
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
@@ -70,10 +71,13 @@ export async function checkoutEquipment(
     const updateData: Partial<Equipment> = { 
       status: 'Borrowed', 
       borrowedBy: user, 
-      borrowerPhone: phone || undefined,
-      borrowedUntil: borrowedUntil || undefined,
+      borrowedUntil: borrowedUntil || addDays(new Date(), 1), // Default to 1 day if not provided
       reminderSent: false,
     };
+
+    if (phone) {
+      updateData.borrowerPhone = phone;
+    }
     
     await updateEquipment(equipmentId, updateData);
     await addLog({ equipmentId, action: 'Borrowed', user, notes });
@@ -83,6 +87,7 @@ export async function checkoutEquipment(
     revalidatePath('/history');
     return { success: true, message: 'Equipment checked out successfully.' };
   } catch (error) {
+    console.error('Checkout Error:', error);
     const message = error instanceof Error ? error.message : 'Failed to checkout equipment.';
     return { success: false, message };
   }
@@ -94,13 +99,13 @@ export async function checkinEquipment(equipmentId: string) {
     if (equipment) {
       await addLog({ equipmentId, action: 'Returned', user: equipment.borrowedBy });
     }
-    // Reset borrow-related fields
+    // Reset borrow-related fields. Using null to clear fields in Firestore.
     await updateEquipment(equipmentId, { 
       status: 'Available', 
-      borrowedBy: undefined, 
-      borrowerPhone: undefined,
-      borrowedUntil: undefined,
-      reminderSent: undefined,
+      borrowedBy: null,
+      borrowerPhone: null,
+      borrowedUntil: null,
+      reminderSent: null,
     });
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
@@ -191,11 +196,10 @@ export async function checkReminders() {
     );
 
     for (const item of borrowedItems) {
-      if (item.borrowedUntil && item.borrowedUntil <= twoDaysFromNow) {
-        console.log(`Reminder triggered for ${item.name}. Due on: ${item.borrowedUntil.toDateString()}`);
+      const borrowedUntilDate = item.borrowedUntil;
+      if (borrowedUntilDate && new Date(borrowedUntilDate) <= twoDaysFromNow) {
+        console.log(`Reminder triggered for ${item.name}. Due on: ${borrowedUntilDate.toDateString()}`);
         await updateEquipment(item.id, { status: 'Reminder', reminderSent: true });
-        // In a real app, you would also send an email or notification here.
-        // For this app, changing the status will serve as the reminder.
         revalidatePath('/');
         revalidatePath(`/equipment/${item.id}`);
       }

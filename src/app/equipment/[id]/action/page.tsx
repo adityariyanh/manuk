@@ -23,12 +23,6 @@ interface PageProps {
   searchParams: { [key: string]: string | string[] | undefined };
 }
 
-export async function generateStaticParams() {
-  const equipment = await getAllEquipment();
-  return equipment.map((item) => ({
-    id: item.id,
-  }));
-}
 
 export default function EquipmentActionPage({ params }: PageProps) {
   const id = params.id as string;
