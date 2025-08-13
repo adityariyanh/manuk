@@ -9,11 +9,11 @@ import { checkinEquipment, checkoutEquipment } from '@/lib/actions';
 import Link from 'next/link';
 import { Textarea } from '@/components/ui/textarea';
 
-export default async function EquipmentActionPage({
-  params,
-}: {
+type Props = {
   params: { id: string };
-}) {
+};
+
+export default async function EquipmentActionPage({ params }: Props) {
   const equipment = await getEquipmentById(params.id);
 
   if (!equipment) {
