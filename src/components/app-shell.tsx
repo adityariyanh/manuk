@@ -91,10 +91,8 @@ function AppNavigation() {
   )
 }
 
-
-export function AppShell({ children }: { children: React.ReactNode }) {
-  return (
-    <AuthProvider>
+function AppShellLayout({ children }: { children: React.ReactNode }) {
+    return (
         <SidebarProvider>
             <AppNavigation />
             <SidebarInset>
@@ -105,6 +103,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 {children}
             </SidebarInset>
         </SidebarProvider>
+    )
+}
+
+
+export function AppShell({ children }: { children: React.ReactNode }) {
+  return (
+    <AuthProvider>
+        <AppShellLayout>
+            {children}
+        </AppShellLayout>
     </AuthProvider>
   );
 }
