@@ -13,8 +13,10 @@ import type { Equipment } from '@/lib/types';
 import { useEffect, useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
-import { QrCode } from 'lucide-react';
+import { QrCode, Download } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ScrollArea } from '@/components/ui/scroll-area';
+import * as XLSX from 'xlsx';
 
 export default function QrCodesPage() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -66,64 +68,95 @@ export default function QrCodesPage() {
     );
   };
 
+  const exportToCsv = () => {
+    if (!equipment.length) {
+      toast({
+        variant: 'destructive',
+        title: 'No Data',
+        description: 'There is no data to export.',
+      });
+      return;
+    }
+
+    const dataToExport = equipment.map((item) => ({
+      'Equipment Name': item.name,
+      'QR Code Action URL': getActionUrl(item.id),
+      'Status': item.status,
+      'Model': item.model,
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Equipment QR Codes');
+    XLSX.writeFile(workbook, 'equipment_qr_codes.csv');
+  };
+
   return (
     <div className="flex flex-col h-full">
-      <header className="p-4 border-b">
-        <h1 className="text-2xl font-bold font-headline flex items-center gap-2">
-          <QrCode />
-          Equipment QR Code URLs
-        </h1>
-        <p className="text-muted-foreground">
-          A list of all equipment and their direct action URLs for QR code generation.
-        </p>
+      <header className="p-4 border-b flex justify-between items-center">
+        <div>
+          <h1 className="text-2xl font-bold font-headline flex items-center gap-2">
+            <QrCode />
+            Equipment QR Code URLs
+          </h1>
+          <p className="text-muted-foreground">
+            A list of all equipment and their direct action URLs for QR code generation.
+          </p>
+        </div>
+        <Button onClick={exportToCsv}>
+          <Download className="mr-2" />
+          Export as CSV
+        </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
-        <div className="border rounded-lg">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead>Equipment Name</TableHead>
-                <TableHead>QR Code Action URL</TableHead>
-                <TableHead className="text-right w-[100px]">Copy</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                  </TableRow>
-                ))
-              ) : equipment.length > 0 ? (
-                equipment.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {getActionUrl(item.id)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(getActionUrl(item.id))}
-                      >
-                        Copy
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
+        <ScrollArea className="h-[calc(100vh-200px)]">
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center h-24">
-                    No equipment found.
-                  </TableCell>
+                  <TableHead>Equipment Name</TableHead>
+                  <TableHead>QR Code Action URL</TableHead>
+                  <TableHead className="text-right w-[100px]">Copy</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                      <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : equipment.length > 0 ? (
+                  equipment.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell className="font-mono text-sm">
+                        {getActionUrl(item.id)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(getActionUrl(item.id))}
+                        >
+                          Copy
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center h-24">
+                      No equipment found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </ScrollArea>
       </main>
     </div>
   );
