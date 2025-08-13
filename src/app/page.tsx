@@ -54,10 +54,10 @@ export default async function DashboardPage() {
             <Table className="table-fixed w-full">
               <TableHeader>
                 <TableRow>
-                  <TableHead className="w-[40%]">Name</TableHead>
-                  <TableHead className="hidden md:table-cell w-[25%]">Model</TableHead>
-                  <TableHead className="hidden sm:table-cell w-[15%]">Status</TableHead>
-                  <TableHead className="text-right w-[20%]">
+                  <TableHead className="w-[40%] lg:w-[35%]">Name</TableHead>
+                  <TableHead className="hidden lg:table-cell lg:w-[25%]">Model</TableHead>
+                  <TableHead className="hidden sm:table-cell w-[20%] lg:w-[15%]">Status</TableHead>
+                  <TableHead className="text-right w-[30%] lg:w-[25%]">
                     Actions
                   </TableHead>
                 </TableRow>
@@ -67,12 +67,12 @@ export default async function DashboardPage() {
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">
                       <div className="font-medium truncate">{item.name}</div>
-                      <div className="text-sm text-muted-foreground md:hidden">{item.brand} - {item.model}</div>
+                      <div className="text-sm text-muted-foreground lg:hidden">{item.brand} - {item.model}</div>
                        <div className="sm:hidden mt-2">
                         <StatusBadge status={item.status} />
                       </div>
                     </TableCell>
-                    <TableCell className="hidden md:table-cell truncate">{item.model}</TableCell>
+                    <TableCell className="hidden lg:table-cell truncate">{item.model}</TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <StatusBadge status={item.status} />
                     </TableCell>
