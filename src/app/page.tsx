@@ -1,16 +1,23 @@
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '@/components/ui/table';
 import { getAllEquipment } from '@/lib/data';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
-import type { Equipment, EquipmentStatus } from '@/lib/types';
-import { Package } from 'lucide-react';
+import type { EquipmentStatus } from '@/lib/types';
+import { Package, MoreHorizontal } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
 
 function StatusBadge({ status }: { status: EquipmentStatus }) {
   const variant: 'default' | 'secondary' | 'destructive' =
@@ -23,50 +30,61 @@ function StatusBadge({ status }: { status: EquipmentStatus }) {
   return <Badge variant={variant}>{status}</Badge>;
 }
 
-function EquipmentCard({ equipment }: { equipment: Equipment }) {
-  return (
-    <Card className="flex flex-col">
-      <CardHeader>
-        <div className="flex items-start justify-between">
-          <div>
-            <CardTitle className="text-xl font-headline">
-              {equipment.name}
-            </CardTitle>
-            <CardDescription>{equipment.model}</CardDescription>
-          </div>
-          <StatusBadge status={equipment.status} />
-        </div>
-      </CardHeader>
-      <CardContent className="flex-grow flex flex-col justify-between">
-        <div className="flex-grow">
-          {equipment.status === 'Borrowed' && equipment.borrowedBy && (
-            <p className="text-sm text-muted-foreground">
-              Borrowed by: {equipment.borrowedBy}
-            </p>
-          )}
-        </div>
-        <Button asChild className="mt-4 w-full">
-          <Link href={`/equipment/${equipment.id}`}>View Details</Link>
-        </Button>
-      </CardContent>
-    </Card>
-  );
-}
-
 export default async function DashboardPage() {
   const equipment = await getAllEquipment();
 
   return (
     <div className="flex flex-col h-full">
       <header className="p-4 border-b">
-        <h1 className="text-2xl font-bold font-headline">Equipment Dashboard</h1>
+        <h1 className="text-2xl font-bold font-headline">
+          Equipment Dashboard
+        </h1>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
         {equipment.length > 0 ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-            {equipment.map((item) => (
-              <EquipmentCard key={item.id} equipment={item} />
-            ))}
+          <div className="border rounded-lg">
+            <Table>
+              <TableHeader>
+                <TableRow>
+                  <TableHead>Name</TableHead>
+                  <TableHead>Model</TableHead>
+                  <TableHead>Status</TableHead>
+                  <TableHead>Borrowed By</TableHead>
+                  <TableHead>
+                    <span className="sr-only">Actions</span>
+                  </TableHead>
+                </TableRow>
+              </TableHeader>
+              <TableBody>
+                {equipment.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell>{item.model}</TableCell>
+                    <TableCell>
+                      <StatusBadge status={item.status} />
+                    </TableCell>
+                    <TableCell>{item.borrowedBy || 'N/A'}</TableCell>
+                    <TableCell className="text-right">
+                      <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                          <Button variant="ghost" className="h-8 w-8 p-0">
+                            <span className="sr-only">Open menu</span>
+                            <MoreHorizontal className="h-4 w-4" />
+                          </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end">
+                          <DropdownMenuItem asChild>
+                            <Link href={`/equipment/${item.id}`}>
+                              View Details
+                            </Link>
+                          </DropdownMenuItem>
+                        </DropdownMenuContent>
+                      </DropdownMenu>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground bg-card rounded-lg p-8">
