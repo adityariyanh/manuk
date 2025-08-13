@@ -78,6 +78,12 @@ export default async function EquipmentDetailsPage({
                        <span>{equipment.borrowerPhone}</span>
                      </div>
                    )}
+                   {equipment.borrowedFrom && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Borrowed From</span>
+                      <span>{format(new Date(equipment.borrowedFrom), 'PPP')}</span>
+                    </div>
+                  )}
                   {equipment.borrowedUntil && (
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Return By</span>

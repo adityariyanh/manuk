@@ -9,6 +9,7 @@ export interface Equipment {
   status: EquipmentStatus;
   borrowedBy?: string;
   borrowerPhone?: string;
+  borrowedFrom?: Date;
   borrowedUntil?: Date;
   reminderSent?: boolean;
 }

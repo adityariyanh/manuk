@@ -36,7 +36,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
   const [isOneDayCheckout, setIsOneDayCheckout] = useState(true);
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
-    to: addDays(new Date(), 4)
+    to: addDays(new Date(), 1)
   });
 
 
@@ -64,7 +64,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
     e.preventDefault();
     if (borrowerName) {
       const borrowedUntil = isOneDayCheckout ? addDays(new Date(), 1) : dateRange?.to;
-      await checkoutEquipment(id, borrowerName, place, description, borrowerPhone, borrowedUntil);
+      await checkoutEquipment(id, borrowerName, place, description, borrowerPhone, dateRange?.from, borrowedUntil);
       redirect(`/equipment/${id}`);
     }
   }
@@ -165,40 +165,60 @@ export default function EquipmentActionPage({ params }: PageProps) {
 
               {!isOneDayCheckout && (
                 <div className="space-y-2">
-                   <Label>Select Return Date</Label>
-                   <Popover>
-                    <PopoverTrigger asChild>
-                      <Button
-                        variant={"outline"}
-                        className="w-full justify-start text-left font-normal"
-                      >
-                        <CalendarIcon className="mr-2 h-4 w-4" />
-                        {dateRange?.from ? (
-                          dateRange.to ? (
-                            <>
-                              {format(dateRange.from, "LLL dd, y")} -{" "}
-                              {format(dateRange.to, "LLL dd, y")}
-                            </>
-                          ) : (
-                            format(dateRange.from, "LLL dd, y")
-                          )
-                        ) : (
-                          <span>Pick a date range</span>
-                        )}
-                      </Button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        initialFocus
-                        mode="range"
-                        defaultMonth={dateRange?.from}
-                        selected={dateRange}
-                        onSelect={setDateRange}
-                        numberOfMonths={1}
-                        disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
-                      />
-                    </PopoverContent>
-                  </Popover>
+                   <Label>Select Borrowing Period</Label>
+                   <div className="grid grid-cols-2 gap-2">
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <Button
+                            variant={"outline"}
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.from ? format(dateRange.from, "LLL dd, y") : <span>Borrow Date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateRange?.from}
+                            onSelect={(date) => setDateRange(prev => ({...prev, from: date}))}
+                            disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                           <Button
+                            variant={"outline"}
+                            className="w-full justify-start text-left font-normal"
+                          >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.to ? format(dateRange.to, "LLL dd, y") : <span>Return Date</span>}
+                          </Button>
+                        </PopoverTrigger>
+                         <PopoverContent className="w-auto p-0" align="start">
+                          <Calendar
+                            mode="single"
+                            selected={dateRange?.to}
+                            onSelect={(date) => setDateRange(prev => ({...prev, to: date}))}
+                             disabled={(date) => 
+                                (dateRange?.from && date < dateRange.from) || 
+                                date < new Date(new Date().setHours(0,0,0,0))
+                            }
+                            initialFocus
+                          />
+                        </PopoverContent>
+                      </Popover>
+                   </div>
+                   <Button 
+                      type="button" 
+                      variant="ghost" 
+                      className="w-full"
+                      onClick={() => setDateRange(prev => ({...prev, from: new Date()}))}
+                    >
+                      Set Borrow Date to Today
+                    </Button>
                 </div>
               )}
 
@@ -239,4 +259,11 @@ export default function EquipmentActionPage({ params }: PageProps) {
       </Card>
     </div>
   );
+}
+
+export async function generateStaticParams() {
+  const equipment = await getAllEquipment();
+  return equipment.map((item) => ({
+    id: item.id,
+  }));
 }

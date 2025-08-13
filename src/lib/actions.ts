@@ -67,13 +67,15 @@ export async function checkoutEquipment(
   place: string,
   description: string,
   phone?: string,
+  borrowedFrom?: Date,
   borrowedUntil?: Date,
 ) {
   try {
     const notes = `Place: ${place}. Purpose: ${description}.`;
     const updateData: Partial<Equipment> = { 
       status: 'Borrowed', 
-      borrowedBy: user, 
+      borrowedBy: user,
+      borrowedFrom: borrowedFrom || new Date(),
       borrowedUntil: borrowedUntil || addDays(new Date(), 1), // Default to 1 day if not provided
       reminderSent: false,
     };
@@ -107,6 +109,7 @@ export async function checkinEquipment(equipmentId: string) {
       status: 'Available', 
       borrowedBy: null,
       borrowerPhone: null,
+      borrowedFrom: null,
       borrowedUntil: null,
       reminderSent: null,
     });
