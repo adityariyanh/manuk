@@ -14,6 +14,7 @@ import type { EquipmentStatus } from '@/lib/types';
 import { Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { DashboardActions } from '@/components/dashboard-actions';
+import { checkReminders } from '@/lib/actions';
 
 function StatusBadge({ status }: { status: EquipmentStatus }) {
   const variant: 'default' | 'secondary' | 'destructive' =
@@ -31,6 +32,8 @@ function StatusBadge({ status }: { status: EquipmentStatus }) {
 }
 
 export default async function DashboardPage() {
+  // Run the reminder check every time the dashboard is loaded.
+  await checkReminders();
   const equipment = await getAllEquipment();
 
   return (

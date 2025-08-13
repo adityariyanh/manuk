@@ -4,7 +4,7 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getAllEquipment, getEquipmentById, updateEquipment } from './data';
-import { addDays } from 'date-fns';
+import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
 
 const equipmentSchema = z.object({
@@ -192,28 +192,37 @@ export async function deleteEquipment(equipmentId: string) {
 
 export async function checkReminders() {
   console.log('Checking for reminders...');
-  const twoDaysFromNow = addDays(new Date(), 2);
-  
+  const today = startOfDay(new Date());
+  const twoDaysFromNow = addDays(today, 2);
+
   try {
     const allEquipment = await getAllEquipment();
-    const borrowedItems = allEquipment.filter(e => 
-      e.status === 'Borrowed' && 
-      e.borrowedUntil && 
-      !e.reminderSent
+    const borrowedItems = allEquipment.filter(
+      (e) =>
+        e.status === 'Borrowed' &&
+        e.borrowedUntil &&
+        !e.reminderSent
     );
 
+    let shouldRevalidate = false;
     for (const item of borrowedItems) {
-      const borrowedUntilDate = item.borrowedUntil;
-      if (borrowedUntilDate && new Date(borrowedUntilDate) <= twoDaysFromNow) {
+      const borrowedUntilDate = startOfDay(item.borrowedUntil!); // Use non-null assertion
+      
+      // Check if the return date is on or before two days from now
+      if (borrowedUntilDate <= twoDaysFromNow) {
         console.log(`Follow up triggered for ${item.name}. Due on: ${borrowedUntilDate.toDateString()}`);
         await updateEquipment(item.id, { status: 'Follow Up', reminderSent: true });
-        revalidatePath('/');
-        revalidatePath(`/equipment/${item.id}`);
+        shouldRevalidate = true;
       }
     }
-     revalidatePath('/');
-     console.log('Follow up check complete.');
+
+    if (shouldRevalidate) {
+      revalidatePath('/');
+      console.log('Follow up check complete. Paths revalidated.');
+    } else {
+      console.log('Follow up check complete. No new reminders.');
+    }
   } catch (error) {
-      console.error("Error checking for follow ups:", error);
+    console.error("Error checking for follow ups:", error);
   }
 }
