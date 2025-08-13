@@ -11,7 +11,7 @@ import {
   SidebarInset,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
-import { Home, PlusCircle, Package, History } from 'lucide-react';
+import { Home, PlusCircle, Package, History, QrCode } from 'lucide-react';
 import { usePathname } from 'next/navigation';
 
 export function AppShell({ children }: { children: React.ReactNode }) {
@@ -21,6 +21,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
     { href: '/', label: 'Dashboard', icon: Home },
     { href: '/equipment/new', label: 'Add Equipment', icon: PlusCircle },
     { href: '/history', label: 'History', icon: History },
+    { href: '/qr-codes', label: 'QR Codes', icon: QrCode },
   ];
 
   return (
@@ -54,7 +55,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
-      <SidebarInset>{children}</SidebarInset>
+      <main>
+        <SidebarInset>{children}</SidebarInset>
+      </main>
     </SidebarProvider>
   );
 }
