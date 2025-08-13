@@ -12,7 +12,7 @@ const roboto = Roboto({
 });
 
 export const metadata: Metadata = {
-  title: 'MANUK',
+  title: 'MANUC',
   description: 'Equipment Management System',
   icons: null,
 };

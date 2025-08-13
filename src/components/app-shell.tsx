@@ -35,7 +35,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             className="flex items-center gap-2 text-lg font-semibold text-primary"
           >
             <Package className="w-6 h-6" />
-            <span className="font-headline">MANUK</span>
+            <span className="font-headline">MANUC</span>
           </Link>
         </SidebarHeader>
         <SidebarContent>
@@ -60,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <SidebarInset>
         <header className="p-4 flex items-center gap-4 md:hidden border-b sticky top-0 bg-background z-10">
           <SidebarTrigger />
-          <h1 className="text-lg font-semibold">MANUK</h1>
+          <h1 className="text-lg font-semibold">MANUC</h1>
         </header>
         {children}
       </SidebarInset>
