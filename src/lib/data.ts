@@ -32,40 +32,60 @@ function docWithDates<T>(docData: any): T {
 
 // Data access functions
 export async function getAllEquipment(): Promise<Equipment[]> {
-  const q = query(collection(db, EQUIPMENT_COLLECTION), orderBy('purchaseDate', 'desc'));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) =>
-    docWithDates<Equipment>({ ...doc.data(), id: doc.id })
-  );
+  try {
+    const q = query(collection(db, EQUIPMENT_COLLECTION), orderBy('purchaseDate', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) =>
+      docWithDates<Equipment>({ ...doc.data(), id: doc.id })
+    );
+  } catch (error) {
+    console.error("Error fetching all equipment:", error);
+    return []; // Return empty array on error
+  }
 }
 
 export async function getEquipmentById(id: string): Promise<Equipment | undefined> {
-  const docRef = doc(db, EQUIPMENT_COLLECTION, id);
-  const docSnap = await getDoc(docRef);
-  if (docSnap.exists()) {
-    return docWithDates<Equipment>({ ...docSnap.data(), id: docSnap.id });
+  try {
+    const docRef = doc(db, EQUIPMENT_COLLECTION, id);
+    const docSnap = await getDoc(docRef);
+    if (docSnap.exists()) {
+      return docWithDates<Equipment>({ ...docSnap.data(), id: docSnap.id });
+    }
+    return undefined;
+  } catch (error) {
+    console.error(`Error fetching equipment by ID (${id}):`, error);
+    return undefined;
   }
-  return undefined;
 }
 
 export async function getLogsForEquipment(equipmentId: string): Promise<LogEntry[]> {
-  const q = query(
-    collection(db, LOGS_COLLECTION),
-    where('equipmentId', '==', equipmentId),
-    orderBy('timestamp', 'desc')
-  );
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) =>
-    docWithDates<LogEntry>({ ...doc.data(), id: doc.id })
-  );
+  try {
+    const q = query(
+      collection(db, LOGS_COLLECTION),
+      where('equipmentId', '==', equipmentId),
+      orderBy('timestamp', 'desc')
+    );
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) =>
+      docWithDates<LogEntry>({ ...doc.data(), id: doc.id })
+    );
+  } catch (error) {
+    console.error(`Error fetching logs for equipment (${equipmentId}):`, error);
+    return [];
+  }
 }
 
 export async function getAllLogs(): Promise<LogEntry[]> {
-  const q = query(collection(db, LOGS_COLLECTION), orderBy('timestamp', 'desc'));
-  const querySnapshot = await getDocs(q);
-  return querySnapshot.docs.map((doc) =>
-    docWithDates<LogEntry>({ ...doc.data(), id: doc.id })
-  );
+  try {
+    const q = query(collection(db, LOGS_COLLECTION), orderBy('timestamp', 'desc'));
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map((doc) =>
+      docWithDates<LogEntry>({ ...doc.data(), id: doc.id })
+    );
+  } catch (error) {
+    console.error("Error fetching all logs:", error);
+    return [];
+  }
 }
 
 export async function addEquipment(

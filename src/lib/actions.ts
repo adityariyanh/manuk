@@ -44,9 +44,10 @@ export async function registerEquipment(
     const newEquipment = await addEquipment(validatedFields.data);
     await addLog({ equipmentId: newEquipment.id, action: 'Registered' });
   } catch (error) {
+    const message = error instanceof Error ? error.message : 'An unknown error occurred';
     console.error('Database Error:', error);
     return {
-      message: 'Database Error: Failed to create equipment.',
+      message: `Database Error: Failed to create equipment. ${message}`,
       success: false,
     };
   }
@@ -67,7 +68,8 @@ export async function checkoutEquipment(equipmentId: string, user: string, place
     revalidatePath('/history');
     return { success: true, message: 'Equipment checked out successfully.' };
   } catch (error) {
-    return { success: false, message: 'Failed to checkout equipment.' };
+    const message = error instanceof Error ? error.message : 'Failed to checkout equipment.';
+    return { success: false, message };
   }
 }
 
@@ -83,7 +85,8 @@ export async function checkinEquipment(equipmentId: string) {
     revalidatePath('/history');
     return { success: true, message: 'Equipment checked in successfully.' };
   } catch (error) {
-    return { success: false, message: 'Failed to checkin equipment.' };
+    const message = error instanceof Error ? error.message : 'Failed to checkin equipment.';
+    return { success: false, message };
   }
 }
 
@@ -96,7 +99,8 @@ export async function markAsRepaired(equipmentId: string) {
     revalidatePath('/history');
     return { success: true, message: 'Equipment marked as repaired.' };
   } catch (error) {
-    return { success: false, message: 'Failed to mark equipment as repaired.' };
+    const message = error instanceof Error ? error.message : 'Failed to mark as repaired.';
+    return { success: false, message };
   }
 }
 
