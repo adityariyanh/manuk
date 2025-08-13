@@ -17,12 +17,6 @@ import { useToast } from '@/hooks/use-toast';
 import { QrCode, Download, Copy } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import * as XLSX from 'xlsx';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import getConfig from 'next/config';
-
-const { publicRuntimeConfig } = getConfig() || { publicRuntimeConfig: {} };
-const basePath = publicRuntimeConfig.basePath || '';
-
 
 export default function QrCodesPage() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -31,7 +25,9 @@ export default function QrCodesPage() {
   const [origin, setOrigin] = useState('');
 
   useEffect(() => {
+    // This will run only on the client side
     setOrigin(window.location.origin);
+
     async function fetchData() {
       try {
         const data = await getAllEquipment();
@@ -52,10 +48,12 @@ export default function QrCodesPage() {
 
   const getActionUrl = (equipmentId: string) => {
     if (!origin) return '';
-    return `${origin}${basePath}/equipment/${equipmentId}/action`;
+    // The basePath is automatically handled by Next.js routing, so we only need the origin.
+    return `${origin}/equipment/${equipmentId}/action`;
   };
 
   const copyToClipboard = (text: string) => {
+    if (!text) return;
     navigator.clipboard.writeText(text).then(
       () => {
         toast({
@@ -145,6 +143,7 @@ export default function QrCodesPage() {
                           variant="outline"
                           size="sm"
                           onClick={() => copyToClipboard(getActionUrl(item.id))}
+                          disabled={!origin}
                         >
                           <Copy className="md:mr-2" />
                           <span className='hidden md:inline'>Copy</span>
