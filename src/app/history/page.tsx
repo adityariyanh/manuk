@@ -37,10 +37,10 @@ export default async function HistoryPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[200px]">Equipment</TableHead>
+                  <TableHead className="min-w-[150px] md:min-w-[200px]">Equipment</TableHead>
                   <TableHead>Action</TableHead>
-                  <TableHead className="min-w-[150px]">User</TableHead>
-                  <TableHead className="min-w-[250px]">Notes</TableHead>
+                  <TableHead className="min-w-[120px]">User</TableHead>
+                  <TableHead className="min-w-[200px] md:min-w-[250px]">Notes</TableHead>
                   <TableHead className="text-right min-w-[150px]">Date</TableHead>
                 </TableRow>
               </TableHeader>

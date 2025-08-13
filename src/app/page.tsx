@@ -48,11 +48,11 @@ export default async function DashboardPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[200px]">Name</TableHead>
+                  <TableHead className="min-w-[150px] md:min-w-[200px]">Name</TableHead>
                   <TableHead className="hidden md:table-cell min-w-[150px]">Model</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead className="hidden lg:table-cell min-w-[150px]">Borrowed By</TableHead>
-                  <TableHead className="w-[220px] text-right">
+                  <TableHead className="w-[120px] md:w-[220px] text-right">
                     Actions
                   </TableHead>
                 </TableRow>

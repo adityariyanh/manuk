@@ -115,8 +115,8 @@ export default function QrCodesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[200px]">Equipment Name</TableHead>
-                  <TableHead className="min-w-[300px]">QR Code Action URL</TableHead>
+                  <TableHead className="min-w-[150px] md:min-w-[200px]">Equipment Name</TableHead>
+                  <TableHead className="min-w-[250px] md:min-w-[300px]">QR Code Action URL</TableHead>
                   <TableHead className="text-right w-[100px]">Copy</TableHead>
                 </TableRow>
               </TableHeader>
@@ -133,7 +133,7 @@ export default function QrCodesPage() {
                   equipment.map((item) => (
                     <TableRow key={item.id}>
                       <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="font-mono text-sm max-w-xs truncate">
+                      <TableCell className="font-mono text-sm max-w-xs md:max-w-sm lg:max-w-md truncate">
                         {getActionUrl(item.id)}
                       </TableCell>
                       <TableCell className="text-right">
