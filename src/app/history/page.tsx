@@ -1,4 +1,6 @@
 
+'use client';
+
 import {
   Table,
   TableBody,
@@ -9,17 +11,71 @@ import {
 } from '@/components/ui/table';
 import { getAllEquipment, getAllLogs } from '@/lib/data';
 import { format, formatDistanceToNow } from 'date-fns';
-import { History } from 'lucide-react';
+import { History, Download } from 'lucide-react';
 import { HistoryItem } from '@/components/history-item';
+import { useEffect, useState } from 'react';
+import type { Equipment, LogEntry } from '@/lib/types';
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
+import * as XLSX from 'xlsx';
+import { Skeleton } from '@/components/ui/skeleton';
 
+export default function HistoryPage() {
+  const [logs, setLogs] = useState<LogEntry[]>([]);
+  const [equipmentList, setEquipmentList] = useState<Equipment[]>([]);
+  const [loading, setLoading] = useState(true);
+  const { toast } = useToast();
 
-export default async function HistoryPage() {
-  const logs = await getAllLogs();
-  const equipmentList = await getAllEquipment();
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const [logData, equipmentData] = await Promise.all([
+          getAllLogs(),
+          getAllEquipment(),
+        ]);
+        setLogs(logData);
+        setEquipmentList(equipmentData);
+      } catch (error) {
+        console.error('Failed to fetch history data', error);
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: 'Failed to load history data.',
+        });
+      } finally {
+        setLoading(false);
+      }
+    }
+    fetchData();
+  }, [toast]);
 
   const getEquipmentName = (equipmentId: string) => {
     const equipment = equipmentList.find((e) => e.id === equipmentId);
     return equipment ? equipment.name : 'Unknown';
+  };
+
+  const exportToCsv = () => {
+    if (!logs.length) {
+      toast({
+        variant: 'destructive',
+        title: 'No Data',
+        description: 'There is no history to export.',
+      });
+      return;
+    }
+
+    const dataToExport = logs.map((log) => ({
+      'Equipment Name': getEquipmentName(log.equipmentId),
+      'Action': log.action,
+      'User': log.user || 'N/A',
+      'Notes': log.notes || 'N/A',
+      'Date': format(log.timestamp, 'yyyy-MM-dd HH:mm:ss'),
+    }));
+
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'History Log');
+    XLSX.writeFile(workbook, 'manuc_history_log.csv');
   };
 
   return (
@@ -32,9 +88,30 @@ export default async function HistoryPage() {
           </h1>
           <p className="text-muted-foreground">A complete log of all equipment activity.</p>
         </div>
+        <Button onClick={exportToCsv} className="w-full md:w-auto">
+          <Download className="mr-2" />
+          Export as CSV
+        </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
-        {logs.length > 0 ? (
+        {loading ? (
+           <div className="space-y-4">
+            {/* Desktop Skeleton */}
+            <div className="hidden md:block border rounded-lg p-4">
+              <div className="space-y-2">
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+                <Skeleton className="h-8 w-full" />
+              </div>
+            </div>
+             {/* Mobile Skeleton */}
+            <div className="md:hidden space-y-4">
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+                <Skeleton className="h-24 w-full" />
+            </div>
+           </div>
+        ) : logs.length > 0 ? (
           <>
             {/* Desktop View */}
             <div className="hidden md:block border rounded-lg overflow-x-auto">
