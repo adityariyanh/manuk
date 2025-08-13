@@ -15,6 +15,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Textarea } from '@/components/ui/textarea';
 import { useToast } from '@/hooks/use-toast';
 import { checkinEquipment, checkoutEquipment, deleteEquipment, markAsRepaired } from '@/lib/actions';
 import type { Equipment } from '@/lib/types';
@@ -25,21 +26,25 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
   const [borrowerName, setBorrowerName] = useState('');
+  const [place, setPlace] = useState('');
+  const [description, setDescription] = useState('');
 
   const handleCheckout = () => {
-    if (!borrowerName.trim()) {
+    if (!borrowerName.trim() || !place.trim() || !description.trim()) {
       toast({
         variant: 'destructive',
         title: 'Checkout Error',
-        description: 'Borrower name cannot be empty.',
+        description: 'All fields are required.',
       });
       return;
     }
     startTransition(async () => {
-      const result = await checkoutEquipment(equipment.id, borrowerName);
+      const result = await checkoutEquipment(equipment.id, borrowerName, place, description);
       if (result.success) {
         toast({ title: 'Success', description: result.message });
         setBorrowerName('');
+        setPlace('');
+        setDescription('');
       } else {
         toast({
           variant: 'destructive',
@@ -109,17 +114,37 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Checkout {equipment.name}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Enter your name to borrow this item.
+                  Enter the details below to borrow this item.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div className="py-4">
-                <Label htmlFor="borrowerName">Your Name</Label>
-                <Input
-                  id="borrowerName"
-                  value={borrowerName}
-                  onChange={(e) => setBorrowerName(e.target.value)}
-                  placeholder="John Doe"
-                />
+              <div className="py-4 space-y-4">
+                <div className="space-y-2">
+                    <Label htmlFor="borrowerName">Your Name</Label>
+                    <Input
+                    id="borrowerName"
+                    value={borrowerName}
+                    onChange={(e) => setBorrowerName(e.target.value)}
+                    placeholder="John Doe"
+                    />
+                </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="place">Place</Label>
+                    <Input
+                    id="place"
+                    value={place}
+                    onChange={(e) => setPlace(e.target.value)}
+                    placeholder="e.g. Room 201, Offsite Event"
+                    />
+                </div>
+                <div className="space-y-2">
+                    <Label htmlFor="description">Purpose/Description</Label>
+                    <Textarea
+                    id="description"
+                    value={description}
+                    onChange={(e) => setDescription(e.target.value)}
+                    placeholder="Describe the purpose of borrowing this item..."
+                    />
+                </div>
               </div>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
