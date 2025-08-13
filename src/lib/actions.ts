@@ -52,7 +52,6 @@ export async function registerEquipment(
 
   revalidatePath('/');
   revalidatePath('/history');
-  // We won't redirect here anymore, we'll let the client handle it after showing a toast.
   return { message: `Successfully added "${validatedFields.data.name}".`, success: true };
 }
 

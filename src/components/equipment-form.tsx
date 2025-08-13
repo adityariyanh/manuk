@@ -49,7 +49,7 @@ export function EquipmentForm() {
             title: "Error adding equipment",
             description: `${state.message} Please correct the following fields: ${errorFields}`
         });
-    } else if (state.message && !state.success) {
+    } else if (state.message) {
       toast({
         variant: "destructive",
         title: "Error",
