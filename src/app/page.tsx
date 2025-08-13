@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -10,14 +11,9 @@ import { getAllEquipment } from '@/lib/data';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import type { EquipmentStatus } from '@/lib/types';
-import { Package, MoreHorizontal } from 'lucide-react';
+import { Package } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DashboardActions } from '@/components/dashboard-actions';
 
 function StatusBadge({ status }: { status: EquipmentStatus }) {
   const variant: 'default' | 'secondary' | 'destructive' =
@@ -50,8 +46,8 @@ export default async function DashboardPage() {
                   <TableHead>Model</TableHead>
                   <TableHead>Status</TableHead>
                   <TableHead>Borrowed By</TableHead>
-                  <TableHead>
-                    <span className="sr-only">Actions</span>
+                  <TableHead className="w-[220px] text-right">
+                    Actions
                   </TableHead>
                 </TableRow>
               </TableHeader>
@@ -65,21 +61,12 @@ export default async function DashboardPage() {
                     </TableCell>
                     <TableCell>{item.borrowedBy || 'N/A'}</TableCell>
                     <TableCell className="text-right">
-                      <DropdownMenu>
-                        <DropdownMenuTrigger asChild>
-                          <Button variant="ghost" className="h-8 w-8 p-0">
-                            <span className="sr-only">Open menu</span>
-                            <MoreHorizontal className="h-4 w-4" />
-                          </Button>
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent align="end">
-                          <DropdownMenuItem asChild>
-                            <Link href={`/equipment/${item.id}`}>
-                              View Details
-                            </Link>
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+                      <div className="flex items-center justify-end gap-2">
+                        <DashboardActions equipment={item} />
+                        <Button asChild variant="outline" size="sm">
+                          <Link href={`/equipment/${item.id}`}>Details</Link>
+                        </Button>
+                      </div>
                     </TableCell>
                   </TableRow>
                 ))}
