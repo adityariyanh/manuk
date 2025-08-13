@@ -9,6 +9,7 @@ import type { Equipment } from './types';
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
   brand: z.string().min(2, 'Brand/Type must be at least 2 characters'),
+  model: z.string().min(1, 'Model is required'),
   category: z.string().min(2, 'Category must be at least 2 characters'),
 });
 
@@ -17,6 +18,7 @@ export type FormState = {
   errors?: {
     name?: string[];
     brand?: string[];
+    model?: string[];
     category?: string[];
   };
   success?: boolean;
@@ -29,6 +31,7 @@ export async function registerEquipment(
   const validatedFields = equipmentSchema.safeParse({
     name: formData.get('name'),
     brand: formData.get('brand'),
+    model: formData.get('model'),
     category: formData.get('category'),
   });
 

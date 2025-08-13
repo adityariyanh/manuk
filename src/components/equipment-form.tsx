@@ -53,7 +53,7 @@ export function EquipmentForm() {
   return (
     <form action={dispatch} ref={formRef}>
       <Card>
-        <CardContent className="p-6 space-y-6">
+        <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
             <Label htmlFor="name">Equipment Name</Label>
             <Input id="name" name="name" placeholder="e.g. Canon EOS R5" required />
@@ -62,15 +62,22 @@ export function EquipmentForm() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="brand">Brand / Type</Label>
-            <Input id="brand" name="brand" placeholder="e.g. Camera" required />
+            <Label htmlFor="brand">Brand</Label>
+            <Input id="brand" name="brand" placeholder="e.g. Canon" required />
             {state.errors?.brand && (
               <p className="text-sm text-destructive">{state.errors.brand[0]}</p>
             )}
           </div>
           <div className="space-y-2">
+            <Label htmlFor="model">Model</Label>
+            <Input id="model" name="model" placeholder="e.g. EOS R5" required />
+            {state.errors?.model && (
+              <p className="text-sm text-destructive">{state.errors.model[0]}</p>
+            )}
+          </div>
+          <div className="space-y-2">
             <Label htmlFor="category">Category</Label>
-            <Input id="category" name="category" placeholder="e.g. Photography, Audio, Lighting" required />
+            <Input id="category" name="category" placeholder="e.g. Photography, Audio" required />
             {state.errors?.category && (
               <p className="text-sm text-destructive">{state.errors.category[0]}</p>
             )}

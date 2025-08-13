@@ -1,4 +1,3 @@
-
 'use client';
 
 import {
@@ -36,42 +35,60 @@ import {
   MoreHorizontal,
   Trash2,
   FileText,
+  CalendarIcon,
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
-import { addDays } from 'date-fns';
+import { addDays, format, type DateRange } from 'date-fns';
+import { Checkbox } from './ui/checkbox';
+import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
+import { Calendar } from './ui/calendar';
 
 export function DashboardActions({ equipment }: { equipment: Equipment }) {
   const { toast } = useToast();
   const [isPending, startTransition] = useTransition();
+  
+  // State for the checkout modal
   const [borrowerName, setBorrowerName] = useState('');
+  const [borrowerPhone, setBorrowerPhone] = useState('');
   const [place, setPlace] = useState('');
   const [description, setDescription] = useState('');
+  const [isOneDayCheckout, setIsOneDayCheckout] = useState(true);
+  const [dateRange, setDateRange] = useState<DateRange | undefined>({
+    from: new Date(),
+    to: addDays(new Date(), 4),
+  });
+  const [isModalOpen, setModalOpen] = useState(false);
+
 
   const handleCheckout = () => {
     if (!borrowerName.trim() || !place.trim() || !description.trim()) {
       toast({
         variant: 'destructive',
         title: 'Checkout Error',
-        description: 'All fields are required.',
+        description: 'Name, Place, and Purpose are required.',
       });
       return;
     }
     startTransition(async () => {
-      // For direct checkout from dashboard, we assume a 1-day checkout
+      const borrowedUntil = isOneDayCheckout ? addDays(new Date(), 1) : dateRange?.to;
       const result = await checkoutEquipment(
         equipment.id,
         borrowerName,
         place,
         description,
-        undefined, // No phone number field in this quick-checkout
-        addDays(new Date(), 1)
+        borrowerPhone,
+        borrowedUntil
       );
       if (result.success) {
         toast({ title: 'Success', description: result.message });
+        // Reset form and close modal
         setBorrowerName('');
         setPlace('');
+        setBorrowerPhone('');
         setDescription('');
+        setIsOneDayCheckout(true);
+        setModalOpen(false);
       } else {
         toast({
           variant: 'destructive',
@@ -131,7 +148,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
     switch (equipment.status) {
       case 'Available':
         return (
-          <AlertDialog>
+          <AlertDialog open={isModalOpen} onOpenChange={setModalOpen}>
             <AlertDialogTrigger asChild>
               <Button size="sm" disabled={isPending}>
                 Checkout
@@ -141,10 +158,10 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Checkout {equipment.name}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Enter the details below to borrow this item for one day. For longer periods, go to the details page.
+                  Enter the details below to borrow this item.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div className="py-4 space-y-4">
+              <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto pr-4">
                 <div className="space-y-2">
                   <Label htmlFor="borrowerName">Your Name</Label>
                   <Input
@@ -155,6 +172,16 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
                     required
                   />
                 </div>
+                 <div className="space-y-2">
+                    <Label htmlFor="borrowerPhone">Phone Number (Optional)</Label>
+                    <Input
+                    id="borrowerPhone"
+                    name="borrowerPhone"
+                    placeholder="e.g. 08123456789"
+                    value={borrowerPhone}
+                    onChange={e => setBorrowerPhone(e.target.value)}
+                    />
+                </div>
                 <div className="space-y-2">
                   <Label htmlFor="place">Place</Label>
                   <Input
@@ -162,7 +189,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
                     value={place}
                     onChange={(e) => setPlace(e.target.value)}
                     placeholder="e.g. Room 201, Offsite Event"
-                     required
+                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -172,9 +199,61 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe the purpose of borrowing this item..."
-                     required
+                    required
                   />
                 </div>
+                 <div className="flex items-center space-x-2">
+                    <Checkbox 
+                    id="one-day-checkout-modal" 
+                    checked={isOneDayCheckout}
+                    onCheckedChange={(checked) => setIsOneDayCheckout(Boolean(checked))}
+                    />
+                    <label
+                    htmlFor="one-day-checkout-modal"
+                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                    1-Day Checkout (Return tomorrow)
+                    </label>
+                </div>
+
+                {!isOneDayCheckout && (
+                    <div className="space-y-2">
+                    <Label>Select Return Date</Label>
+                    <Popover>
+                        <PopoverTrigger asChild>
+                        <Button
+                            variant={"outline"}
+                            className="w-full justify-start text-left font-normal"
+                        >
+                            <CalendarIcon className="mr-2 h-4 w-4" />
+                            {dateRange?.from ? (
+                            dateRange.to ? (
+                                <>
+                                {format(dateRange.from, "LLL dd, y")} -{" "}
+                                {format(dateRange.to, "LLL dd, y")}
+                                </>
+                            ) : (
+                                format(dateRange.from, "LLL dd, y")
+                            )
+                            ) : (
+                            <span>Pick a date range</span>
+                            )}
+                        </Button>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                            initialFocus
+                            mode="range"
+                            defaultMonth={dateRange?.from}
+                            selected={dateRange}
+                            onSelect={setDateRange}
+                            numberOfMonths={1}
+                            disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                        />
+                        </PopoverContent>
+                    </Popover>
+                    </div>
+                )}
               </div>
               <AlertDialogFooter>
                 <AlertDialogCancel>Cancel</AlertDialogCancel>
