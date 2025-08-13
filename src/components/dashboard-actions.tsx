@@ -348,9 +348,9 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
             </Link>
           </Button>
           <AlertDialogTrigger asChild>
-            <Button variant="destructive" size="sm">
+            <Button variant="destructive" size="icon">
               <Trash2 />
-              <span className="ml-2">Delete</span>
+              <span className="sr-only">Delete</span>
             </Button>
           </AlertDialogTrigger>
         </div>
