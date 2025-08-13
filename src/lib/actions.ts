@@ -41,14 +41,15 @@ export async function registerEquipment(
   try {
     const newEquipment = await addEquipment(validatedFields.data);
     await addLog({ equipmentId: newEquipment.id, action: 'Registered' });
-    revalidatePath('/');
-    revalidatePath('/history');
-    redirect(`/equipment/${newEquipment.id}`);
   } catch (error) {
     return {
       message: 'Database Error: Failed to create equipment.',
     };
   }
+
+  revalidatePath('/');
+  revalidatePath('/history');
+  redirect('/');
 }
 
 export async function checkoutEquipment(equipmentId: string, user: string) {

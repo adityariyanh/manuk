@@ -45,6 +45,7 @@ let logStore: LogEntry[] = [
   { id: 'l9', equipmentId: '4', action: 'Borrowed', user: 'Charlie', timestamp: new Date('2024-05-01') },
   { id: 'l10', equipmentId: '4', action: 'Returned', user: 'Charlie', timestamp: new Date('2024-05-05') },
   { id: 'l11', equipmentId: '1', action: 'Borrowed', user: 'David', timestamp: new Date('2024-05-12') },
+  { id: 'l12', equipmentId: '2', action: 'Returned', user: 'Alice', timestamp: new Date('2024-05-15') },
 ];
 
 // Data access functions
