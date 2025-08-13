@@ -40,6 +40,7 @@ export async function registerEquipment(
 
   try {
     const newEquipment = await addEquipment(validatedFields.data);
+    await addLog({ equipmentId: newEquipment.id, action: 'Registered' });
     revalidatePath('/');
     redirect(`/equipment/${newEquipment.id}`);
   } catch (error) {
@@ -64,8 +65,10 @@ export async function checkoutEquipment(equipmentId: string, user: string) {
 export async function checkinEquipment(equipmentId: string) {
   try {
     const equipment = await getEquipmentById(equipmentId);
+    if (equipment) {
+      await addLog({ equipmentId, action: 'Returned', user: equipment.borrowedBy });
+    }
     await updateEquipment(equipmentId, { status: 'Available', borrowedBy: undefined });
-    await addLog({ equipmentId, action: 'Returned', user: equipment?.borrowedBy });
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
     return { success: true, message: 'Equipment checked in successfully.' };

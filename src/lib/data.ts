@@ -64,7 +64,6 @@ export async function addEquipment(equipment: Omit<Equipment, 'id' | 'status'>):
     status: 'Available',
   };
   equipmentStore.push(newEquipment);
-  addLog({ equipmentId: newEquipment.id, action: 'Registered' });
   return Promise.resolve(newEquipment);
 }
 
