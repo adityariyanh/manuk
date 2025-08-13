@@ -11,8 +11,9 @@ import { CalendarIcon, Loader2 } from 'lucide-react';
 import { format } from 'date-fns';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
+import { useRouter } from 'next/navigation';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -25,24 +26,40 @@ function SubmitButton() {
 }
 
 export function EquipmentForm() {
-  const initialState: FormState = { message: '', errors: {} };
+  const initialState: FormState = { message: '', errors: {}, success: false };
   const [state, dispatch] = useActionState(registerEquipment, initialState);
   const [date, setDate] = useState<Date | undefined>();
   const { toast } = useToast();
+  const router = useRouter();
+  const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
-    if (state.message && state.errors) {
+    if (state.success) {
+      toast({
+        title: 'Success!',
+        description: state.message,
+      });
+      formRef.current?.reset();
+      setDate(undefined);
+      router.push('/');
+    } else if (state.message && state.errors) {
         const errorFields = Object.keys(state.errors).join(', ');
         toast({
             variant: "destructive",
             title: "Error adding equipment",
-            description: `Please correct the following fields: ${errorFields}`
+            description: `${state.message} Please correct the following fields: ${errorFields}`
         });
+    } else if (state.message && !state.success) {
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: state.message,
+      });
     }
-  }, [state, toast])
+  }, [state, toast, router]);
 
   return (
-    <form action={dispatch}>
+    <form action={dispatch} ref={formRef}>
       <Card>
         <CardContent className="p-6 space-y-6">
           <div className="space-y-2">

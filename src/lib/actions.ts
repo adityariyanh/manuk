@@ -19,6 +19,7 @@ export type FormState = {
     model?: string[];
     purchaseDate?: string[];
   };
+  success?: boolean;
 };
 
 export async function registerEquipment(
@@ -35,6 +36,7 @@ export async function registerEquipment(
     return {
       message: 'Failed to create equipment.',
       errors: validatedFields.error.flatten().fieldErrors,
+      success: false,
     };
   }
 
@@ -44,12 +46,14 @@ export async function registerEquipment(
   } catch (error) {
     return {
       message: 'Database Error: Failed to create equipment.',
+      success: false,
     };
   }
 
   revalidatePath('/');
   revalidatePath('/history');
-  redirect('/');
+  // We won't redirect here anymore, we'll let the client handle it after showing a toast.
+  return { message: `Successfully added "${validatedFields.data.name}".`, success: true };
 }
 
 export async function checkoutEquipment(equipmentId: string, user: string) {
