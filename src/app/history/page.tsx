@@ -1,3 +1,4 @@
+
 import {
   Table,
   TableBody,
@@ -7,9 +8,10 @@ import {
   TableRow,
 } from '@/components/ui/table';
 import { getAllEquipment, getAllLogs } from '@/lib/data';
-import type { Equipment } from '@/lib/types';
 import { format, formatDistanceToNow } from 'date-fns';
 import { History } from 'lucide-react';
+import { HistoryItem } from '@/components/history-item';
+
 
 export default async function HistoryPage() {
   const logs = await getAllLogs();
@@ -33,39 +35,50 @@ export default async function HistoryPage() {
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
         {logs.length > 0 ? (
-          <div className="border rounded-lg overflow-x-auto">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="min-w-[150px] md:min-w-[200px]">Equipment</TableHead>
-                  <TableHead>Action</TableHead>
-                  <TableHead className="min-w-[120px]">User</TableHead>
-                  <TableHead className="min-w-[200px] md:min-w-[250px]">Notes</TableHead>
-                  <TableHead className="text-right min-w-[150px]">Date</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {logs.map((log) => (
-                  <TableRow key={log.id}>
-                    <TableCell className="font-medium">
-                      {getEquipmentName(log.equipmentId)}
-                    </TableCell>
-                    <TableCell>{log.action}</TableCell>
-                    <TableCell>{log.user || 'N/A'}</TableCell>
-                    <TableCell className="max-w-xs truncate">
-                      {log.notes || 'N/A'}
-                    </TableCell>
-                    <TableCell
-                      className="text-right"
-                      title={format(log.timestamp, 'PPP p')}
-                    >
-                      {formatDistanceToNow(log.timestamp, { addSuffix: true })}
-                    </TableCell>
+          <>
+            {/* Desktop View */}
+            <div className="hidden md:block border rounded-lg overflow-x-auto">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead className="min-w-[150px] md:min-w-[200px]">Equipment</TableHead>
+                    <TableHead>Action</TableHead>
+                    <TableHead className="min-w-[120px]">User</TableHead>
+                    <TableHead className="min-w-[200px] md:min-w-[250px]">Notes</TableHead>
+                    <TableHead className="text-right min-w-[150px]">Date</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
-          </div>
+                </TableHeader>
+                <TableBody>
+                  {logs.map((log) => (
+                    <TableRow key={log.id}>
+                      <TableCell className="font-medium">
+                        {getEquipmentName(log.equipmentId)}
+                      </TableCell>
+                      <TableCell>{log.action}</TableCell>
+                      <TableCell>{log.user || 'N/A'}</TableCell>
+                      <TableCell className="max-w-xs truncate">
+                        {log.notes || 'N/A'}
+                      </TableCell>
+                      <TableCell
+                        className="text-right"
+                        title={format(log.timestamp, 'PPP p')}
+                      >
+                        {formatDistanceToNow(log.timestamp, { addSuffix: true })}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+            {/* Mobile View */}
+             <div className="md:hidden">
+                <div className="border rounded-md">
+                   {logs.map((log) => (
+                      <HistoryItem key={log.id} log={log} equipmentName={getEquipmentName(log.equipmentId)} />
+                    ))}
+                </div>
+            </div>
+          </>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground bg-card rounded-lg p-8">
             <History className="w-16 h-16 mb-4" />

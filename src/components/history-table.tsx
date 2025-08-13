@@ -16,23 +16,8 @@ import {
 } from '@/components/ui/table';
 import type { LogEntry } from '@/lib/types';
 import { format, formatDistanceToNow } from 'date-fns';
+import { HistoryItem } from './history-item';
 
-function HistoryItem({ log }: { log: LogEntry }) {
-    return (
-        <div className="border-b p-4 space-y-2">
-            <div className='flex justify-between items-center'>
-                <span className="font-medium">{log.action}</span>
-                 <span className="text-sm text-muted-foreground" title={format(log.timestamp, 'PPP p')}>
-                    {formatDistanceToNow(log.timestamp, { addSuffix: true })}
-                </span>
-            </div>
-            <div className="text-sm text-muted-foreground space-y-1">
-                <p><strong>User:</strong> {log.user || 'N/A'}</p>
-                <p><strong>Notes:</strong> {log.notes || 'N/A'}</p>
-            </div>
-        </div>
-    )
-}
 
 export function HistoryTable({ logs }: { logs: LogEntry[] }) {
   return (
