@@ -1,10 +1,8 @@
 'use server';
 
 import { revalidatePath } from 'next/cache';
-import { redirect } from 'next/navigation';
 import { z } from 'zod';
-import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getEquipmentById, getHistoricalBorrowingDataString, updateEquipment } from './data';
-import { suggestReplacementEquipment } from '@/ai/flows/suggest-replacement-equipment';
+import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getEquipmentById, updateEquipment } from './data';
 
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
@@ -106,8 +104,8 @@ export async function markAsRepaired(equipmentId: string) {
 
 export type RepairState = {
   message: string;
-  suggestions?: Awaited<ReturnType<typeof suggestReplacementEquipment>>;
   error?: string;
+  success?: boolean;
 }
 
 export async function reportForRepair(
@@ -119,34 +117,28 @@ export async function reportForRepair(
     const problem = formData.get('problem') as string;
 
     if(!equipmentId || !userRole || !problem) {
-        return { message: "Invalid input", error: "Missing required fields." };
+        return { message: "Invalid input", error: "Missing required fields.", success: false };
     }
 
     try {
         const equipment = await getEquipmentById(equipmentId);
         if (!equipment) {
-            return { message: "Equipment not found", error: "The specified equipment does not exist." };
+            return { message: "Equipment not found", error: "The specified equipment does not exist.", success: false };
         }
 
         await updateEquipment(equipmentId, { status: 'Under Repair' });
-        await addLog({ equipmentId, action: 'Reported for Repair', user: 'Admin', notes: problem });
-
-        const historicalData = await getHistoricalBorrowingDataString();
-        
-        const suggestions = await suggestReplacementEquipment({
-            brokenEquipmentName: equipment.name,
-            userRole: userRole,
-            historicalBorrowingData: historicalData,
-        });
+        await addLog({ equipmentId, action: 'Reported for Repair', user: userRole, notes: problem });
 
         revalidatePath('/');
         revalidatePath(`/equipment/${equipmentId}`);
         revalidatePath('/history');
         
-        return { message: "Successfully reported for repair and got suggestions.", suggestions };
+        return { message: "Successfully reported for repair.", success: true };
 
     } catch (error) {
-        return { message: "An error occurred", error: error instanceof Error ? error.message : String(error) };
+        const errorMessage = error instanceof Error ? error.message : String(error);
+        console.error("Report for Repair Error:", errorMessage);
+        return { message: "An error occurred", error: errorMessage, success: false };
     }
 }
 

@@ -1,4 +1,4 @@
 import { config } from 'dotenv';
 config();
 
-import '@/ai/flows/suggest-replacement-equipment.ts';
+// Intentionally left blank. Flows can be added here for development.
