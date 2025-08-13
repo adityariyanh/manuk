@@ -4,6 +4,7 @@ import { Roboto } from 'next/font/google';
 import './globals.css';
 import { Toaster } from '@/components/ui/toaster';
 import { AppShell } from '@/components/app-shell';
+import { AuthProvider } from '@/hooks/use-auth';
 
 const roboto = Roboto({
   subsets: ['latin'],
@@ -25,9 +26,11 @@ export default function RootLayout({
   return (
     <html lang="en" className="dark">
       <body className={`${roboto.variable} font-body antialiased`}>
-        <AppShell>
-          {children}
-        </AppShell>
+        <AuthProvider>
+          <AppShell>
+            {children}
+          </AppShell>
+        </AuthProvider>
         <Toaster />
       </body>
     </html>

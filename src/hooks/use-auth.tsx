@@ -1,7 +1,7 @@
 
 'use client';
 
-import { useState, useEffect, createContext, useContext } from 'react';
+import { useState, useEffect, createContext, useContext, type ReactNode } from 'react';
 import { onAuthStateChanged, type User, signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { usePathname, useRouter } from 'next/navigation';
@@ -15,9 +15,10 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const adminRoutes = ['/', '/equipment/new', '/history', '/qr-codes'];
+const publicRoutes = ['/login']; // Routes accessible without authentication
+const equipmentRoutesPattern = /^\/equipment\/.*$/; // Regex for equipment routes
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
+export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
   const pathname = usePathname();
@@ -28,16 +29,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setUser(user);
       setLoading(false);
     });
-
     return () => unsubscribe();
   }, []);
 
   useEffect(() => {
     if (loading) return;
 
-    const isAdminRoute = adminRoutes.includes(pathname);
+    const isPublic = publicRoutes.includes(pathname);
+    const isEquipmentRoute = equipmentRoutesPattern.test(pathname);
 
-    if (!user && isAdminRoute) {
+    if (!user && !isPublic && !isEquipmentRoute) {
       router.push('/login');
     }
   }, [user, loading, pathname, router]);
@@ -46,28 +47,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await signOut(auth);
     router.push('/login');
   };
-  
+
   const value = { user, loading, logout };
+  
+  const isPublic = publicRoutes.includes(pathname);
+  const isEquipmentRoute = equipmentRoutesPattern.test(pathname);
 
   if (loading) {
     return (
-        <div className="flex items-center justify-center h-screen">
-            <Loader2 className="w-12 h-12 animate-spin" />
-        </div>
-    )
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-12 h-12 animate-spin" />
+      </div>
+    );
+  }
+  
+  if (!user && !isPublic && !isEquipmentRoute) {
+     return (
+      <div className="flex items-center justify-center h-screen">
+        <Loader2 className="w-12 h-12 animate-spin" />
+      </div>
+    );
   }
 
-  // Allow public access to non-admin routes
-  if (!adminRoutes.includes(pathname)) {
-    return <>{children}</>;
-  }
-
-  // For admin routes, only render if the user is authenticated
-  if (user && adminRoutes.includes(pathname)) {
-     return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-  }
-
-  return null; // Or a redirect component
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
 export const useAuth = (): AuthContextType => {
