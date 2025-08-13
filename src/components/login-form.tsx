@@ -1,6 +1,7 @@
+
 'use client';
 
-import { useEffect, useRef, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -14,9 +15,10 @@ import {
 } from '@/components/ui/card';
 import { Loader2 } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
-import { signInWithEmail } from '@/lib/actions';
 import { useAuth } from '@/hooks/use-auth';
 import { useRouter } from 'next/navigation';
+import { signInWithEmailAndPassword } from 'firebase/auth';
+import { auth } from '@/lib/firebase';
 
 export function LoginForm() {
   const { toast } = useToast();
@@ -47,27 +49,32 @@ export function LoginForm() {
 
     startTransition(async () => {
       try {
-        const result = await signInWithEmail({ email, password });
-        if (result.success) {
-          toast({
-            title: 'Login Successful!',
-            description: 'Redirecting to your dashboard...',
-          });
-          // The redirect will be handled by the useAuth hook detecting the user
-        } else {
-           toast({
-            variant: "destructive",
-            title: "Login Failed",
-            description: result.message,
-          });
-        }
-      } catch (error) {
-        const message = error instanceof Error ? error.message : 'An unexpected error occurred.';
-         toast({
-            variant: "destructive",
-            title: "Login Error",
-            description: message,
-          });
+        await signInWithEmailAndPassword(auth, email, password);
+        toast({
+          title: 'Login Successful!',
+          description: 'Redirecting to your dashboard...',
+        });
+        // The redirect is handled by the useAuth hook and the main page component
+      } catch (error: any) {
+        let errorMessage = 'An unknown error occurred.';
+         switch (error.code) {
+            case 'auth/user-not-found':
+            case 'auth/wrong-password':
+            case 'auth/invalid-credential':
+              errorMessage = 'Invalid email or password.';
+              break;
+            case 'auth/invalid-email':
+              errorMessage = 'Please enter a valid email address.';
+              break;
+            default:
+              errorMessage = 'Failed to login. Please try again later.';
+              break;
+          }
+        toast({
+          variant: "destructive",
+          title: "Login Failed",
+          description: errorMessage,
+        });
       }
     });
   };

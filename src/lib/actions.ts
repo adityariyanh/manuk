@@ -6,8 +6,7 @@ import { z } from 'zod';
 import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getAllEquipment, getEquipmentById, updateEquipment, deleteField } from './data';
 import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
-import { signInWithEmailAndPassword } from 'firebase/auth';
-import { auth } from './firebase';
+
 
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
@@ -217,50 +216,5 @@ export async function checkReminders() {
     }
   } catch (error) {
     console.error("Error checking for follow ups:", error);
-  }
-}
-
-export type LoginState = {
-  message: string;
-  success: boolean;
-};
-
-const loginSchema = z.object({
-  email: z.string().email('Invalid email address.'),
-  password: z.string().min(1, 'Password cannot be empty.'),
-});
-
-
-export async function signInWithEmail(credentials: z.infer<typeof loginSchema>): Promise<LoginState> {
-  const validatedCredentials = loginSchema.safeParse(credentials);
-
-  if (!validatedCredentials.success) {
-    const errors = validatedCredentials.error.flatten().fieldErrors;
-    const errorMessage = errors.email?.[0] || errors.password?.[0] || 'Invalid credentials';
-    return { message: errorMessage, success: false };
-  }
-
-  const { email, password } = validatedCredentials.data;
-
-  try {
-    await signInWithEmailAndPassword(auth, email, password);
-    return { message: 'Login successful!', success: true };
-  } catch (error: any) {
-    let errorMessage = 'An unknown error occurred.';
-    switch (error.code) {
-      case 'auth/user-not-found':
-      case 'auth/wrong-password':
-      case 'auth/invalid-credential':
-        errorMessage = 'Invalid email or password.';
-        break;
-      case 'auth/invalid-email':
-        errorMessage = 'Please enter a valid email address.';
-        break;
-      default:
-        errorMessage = 'Failed to login. Please try again later.';
-        break;
-    }
-    console.error('Firebase Auth Error:', error.code, error.message);
-    return { message: errorMessage, success: false };
   }
 }
