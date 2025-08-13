@@ -109,7 +109,6 @@ export type RepairState = {
 }
 
 export async function reportForRepair(
-  prevState: RepairState,
   formData: FormData,
 ): Promise<RepairState> {
     const equipmentId = formData.get('equipmentId') as string;

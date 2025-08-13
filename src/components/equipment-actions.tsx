@@ -20,8 +20,7 @@ import {
 } from '@/lib/actions';
 import type { Equipment } from '@/lib/types';
 import { Loader2, Wrench, CheckCircle } from 'lucide-react';
-import { useEffect, useActionState, useRef, useState, useTransition } from 'react';
-import { useFormStatus } from 'react-dom';
+import { useEffect, useRef, useState, useTransition } from 'react';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
 import { Input } from './ui/input';
@@ -33,10 +32,29 @@ function RepairForm({
   equipmentId: string;
   onFormSubmit: (state: RepairState) => void;
 }) {
-  const { pending } = useFormStatus();
+  const [isPending, startTransition] = useTransition();
+  const formRef = useRef<HTMLFormElement>(null);
+
+  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    startTransition(async () => {
+      const result = await reportForRepair(formData);
+      onFormSubmit(result);
+      if (result.success) {
+        formRef.current?.reset();
+      }
+    });
+  };
 
   return (
-    <>
+    <form onSubmit={handleSubmit} ref={formRef}>
+      <AlertDialogHeader>
+        <AlertDialogTitle>Report for Repair</AlertDialogTitle>
+        <AlertDialogDescription>
+          Describe the issue to submit this equipment for repair.
+        </AlertDialogDescription>
+      </AlertDialogHeader>
       <div className="py-4 space-y-4">
         <input type="hidden" name="equipmentId" value={equipmentId} />
         <div className="space-y-2">
@@ -46,7 +64,7 @@ function RepairForm({
             name="userName"
             placeholder="John Doe"
             required
-            disabled={pending}
+            disabled={isPending}
           />
         </div>
         <div className="space-y-2">
@@ -56,38 +74,33 @@ function RepairForm({
             name="problem"
             placeholder="Describe the issue with the equipment..."
             required
-            disabled={pending}
+            disabled={isPending}
           />
         </div>
       </div>
       <AlertDialogFooter>
-        <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
-        <Button type="submit" variant="destructive" disabled={pending}>
-          {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+        <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+        <Button type="submit" variant="destructive" disabled={isPending}>
+          {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Confirm Report
         </Button>
       </AlertDialogFooter>
-    </>
+    </form>
   );
 }
+
 
 export function EquipmentActions({ equipment }: { equipment: Equipment }) {
   const { toast } = useToast();
   const [isRepairing, startRepairTransition] = useTransition();
-
   const [isDialogOpen, setDialogOpen] = useState(false);
   
-  const initialRepairState: RepairState = { message: '' };
-  const formRef = useRef<HTMLFormElement>(null);
-  
-  const handleRepairAction = async (formData: FormData) => {
-    const result = await reportForRepair(initialRepairState, formData);
+  const handleFormSubmit = (result: RepairState) => {
      if (result.success) {
       toast({
         title: 'Success',
         description: result.message,
       });
-      formRef.current?.reset();
       setDialogOpen(false);
     } else if (result.error) {
       toast({
@@ -135,15 +148,7 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
-             <form action={handleRepairAction} ref={formRef}>
-                <AlertDialogHeader>
-                    <AlertDialogTitle>Report for Repair</AlertDialogTitle>
-                    <AlertDialogDescription>
-                    Describe the issue to submit this equipment for repair.
-                    </AlertDialogDescription>
-                </AlertDialogHeader>
-                <RepairForm equipmentId={equipment.id} onFormSubmit={() => {}} />
-            </form>
+             <RepairForm equipmentId={equipment.id} onFormSubmit={handleFormSubmit} />
           </AlertDialogContent>
         </AlertDialog>
       )}
