@@ -8,6 +8,7 @@ import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from './firebase';
+import { redirect } from 'next/navigation';
 
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
@@ -240,9 +241,6 @@ export async function signInWithEmail(prevState: LoginState, formData: FormData)
   }
 
   try {
-    // This doesn't actually sign the user in on the server,
-    // but verifies the credentials. The client-side handles the actual sign-in state.
-    // This is a common pattern for Next.js Server Actions with client-side auth libraries.
     await signInWithEmailAndPassword(auth, email, password);
     return { message: 'Login successful!', success: true };
   } catch (error: any) {

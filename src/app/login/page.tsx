@@ -30,16 +30,16 @@ export default function LoginPage() {
   const { toast } = useToast();
   const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
 
 
   useEffect(() => {
     // If the user is already logged in (e.g. from a previous session or after a successful login), 
-    // redirect them to the dashboard.
-    if (user) {
+    // redirect them to the dashboard. This is the primary redirect logic.
+    if (!loading && user) {
       router.push('/');
     }
-  }, [user, router]);
+  }, [user, loading, router]);
 
 
   useEffect(() => {
@@ -58,7 +58,7 @@ export default function LoginPage() {
         description: state.message,
       });
     }
-  }, [state, toast, router]);
+  }, [state, toast]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-muted">
