@@ -1,7 +1,14 @@
 import type { Equipment, LogEntry } from './types';
 
 // In-memory store
-let equipmentStore: Equipment[] = [
+// Using globalThis to ensure the store persists across hot reloads in development
+const globalForStore = globalThis as unknown as {
+  equipmentStore: Equipment[];
+  logStore: LogEntry[];
+};
+
+
+const equipmentStore: Equipment[] = globalForStore.equipmentStore || [
   {
     id: '1',
     name: 'Canon EOS R5',
@@ -33,7 +40,7 @@ let equipmentStore: Equipment[] = [
   },
 ];
 
-let logStore: LogEntry[] = [
+const logStore: LogEntry[] = globalForStore.logStore || [
   { id: 'l1', equipmentId: '1', action: 'Registered', timestamp: new Date('2022-03-15') },
   { id: 'l2', equipmentId: '2', action: 'Registered', timestamp: new Date('2023-01-20') },
   { id: 'l3', equipmentId: '2', action: 'Borrowed', user: 'Alice', timestamp: new Date('2024-05-10') },
@@ -47,6 +54,12 @@ let logStore: LogEntry[] = [
   { id: 'l11', equipmentId: '1', action: 'Borrowed', user: 'David', timestamp: new Date('2024-05-12') },
   { id: 'l12', equipmentId: '2', action: 'Returned', user: 'Alice', timestamp: new Date('2024-05-15') },
 ];
+
+if (process.env.NODE_ENV !== 'production') {
+  globalForStore.equipmentStore = equipmentStore;
+  globalForStore.logStore = logStore;
+}
+
 
 // Data access functions
 export async function getAllEquipment(): Promise<Equipment[]> {

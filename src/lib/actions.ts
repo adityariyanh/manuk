@@ -52,6 +52,7 @@ export async function registerEquipment(
 
   revalidatePath('/');
   revalidatePath('/history');
+  revalidatePath('/equipment/new');
   return { message: `Successfully added "${validatedFields.data.name}".`, success: true };
 }
 
