@@ -23,6 +23,10 @@ function StatusBadge({ status }: { status: EquipmentStatus }) {
       ? 'secondary'
       : 'destructive';
 
+  if (status === 'Reminder') {
+     return <Badge variant='destructive'>Due Soon</Badge>;
+  }
+
   return <Badge variant={variant}>{status}</Badge>;
 }
 
@@ -60,7 +64,7 @@ export default async function DashboardPage() {
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">
                       <div className="font-medium">{item.name}</div>
-                      <div className="text-sm text-muted-foreground md:hidden">{item.model}</div>
+                      <div className="text-sm text-muted-foreground md:hidden">{item.brand}</div>
                        <div className="sm:hidden mt-2">
                         <StatusBadge status={item.status} />
                       </div>

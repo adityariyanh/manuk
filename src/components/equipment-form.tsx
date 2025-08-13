@@ -5,15 +5,11 @@ import { useActionState } from 'react';
 import { registerEquipment, type FormState } from '@/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Calendar } from '@/components/ui/calendar';
-import { Popover, PopoverTrigger, PopoverContent } from '@/components/ui/popover';
-import { CalendarIcon, Loader2 } from 'lucide-react';
-import { format } from 'date-fns';
+import { Loader2 } from 'lucide-react';
 import { Card, CardContent, CardFooter } from '@/components/ui/card';
 import { Label } from '@/components/ui/label';
-import { useEffect, useState, useRef } from 'react';
+import { useEffect, useRef } from 'react';
 import { useToast } from '@/hooks/use-toast';
-import { useRouter } from 'next/navigation';
 
 function SubmitButton() {
   const { pending } = useFormStatus();
@@ -28,9 +24,7 @@ function SubmitButton() {
 export function EquipmentForm() {
   const initialState: FormState = { message: '', errors: {}, success: false };
   const [state, dispatch] = useActionState(registerEquipment, initialState);
-  const [date, setDate] = useState<Date | undefined>();
   const { toast } = useToast();
-  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
 
   useEffect(() => {
@@ -40,11 +34,6 @@ export function EquipmentForm() {
         description: state.message,
       });
       formRef.current?.reset();
-      setDate(undefined);
-      // We no longer need to manually redirect, revalidatePath will refresh the data
-      // and the user can choose to navigate away or add another item.
-      // A full redirect can be jarring. If you still want it, uncomment the line below.
-      // router.push('/');
     } else if (state.message && state.errors) {
         const errorFields = Object.keys(state.errors).join(', ');
         toast({
@@ -59,7 +48,7 @@ export function EquipmentForm() {
         description: state.message,
       });
     }
-  }, [state, toast, router]);
+  }, [state, toast]);
 
   return (
     <form action={dispatch} ref={formRef}>
@@ -73,37 +62,17 @@ export function EquipmentForm() {
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="model">Model/Type</Label>
-            <Input id="model" name="model" placeholder="e.g. Camera" required />
-            {state.errors?.model && (
-              <p className="text-sm text-destructive">{state.errors.model[0]}</p>
+            <Label htmlFor="brand">Brand / Type</Label>
+            <Input id="brand" name="brand" placeholder="e.g. Camera" required />
+            {state.errors?.brand && (
+              <p className="text-sm text-destructive">{state.errors.brand[0]}</p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="purchaseDate">Purchase Date</Label>
-            <Popover>
-              <PopoverTrigger asChild>
-                <Button
-                  variant="outline"
-                  className="w-full justify-start text-left font-normal"
-                >
-                  <CalendarIcon className="mr-2 h-4 w-4" />
-                  {date ? format(date, 'PPP') : <span>Pick a date</span>}
-                </Button>
-              </PopoverTrigger>
-              <PopoverContent className="w-auto p-0">
-                <Calendar
-                  mode="single"
-                  selected={date}
-                  onSelect={setDate}
-                  initialFocus
-                  disabled={(d) => d > new Date()}
-                />
-              </PopoverContent>
-            </Popover>
-            <input type="hidden" name="purchaseDate" value={date?.toISOString() || ''} />
-            {state.errors?.purchaseDate && (
-                <p className="text-sm text-destructive">{state.errors.purchaseDate[0]}</p>
+            <Label htmlFor="category">Category</Label>
+            <Input id="category" name="category" placeholder="e.g. Photography, Audio, Lighting" required />
+            {state.errors?.category && (
+              <p className="text-sm text-destructive">{state.errors.category[0]}</p>
             )}
           </div>
         </CardContent>

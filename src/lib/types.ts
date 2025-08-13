@@ -1,12 +1,15 @@
-export type EquipmentStatus = 'Available' | 'Borrowed' | 'Under Repair';
+export type EquipmentStatus = 'Available' | 'Borrowed' | 'Under Repair' | 'Reminder';
 
 export interface Equipment {
   id: string;
   name: string;
-  model: string;
-  purchaseDate: Date;
+  brand: string;
+  category: string;
   status: EquipmentStatus;
   borrowedBy?: string;
+  borrowerPhone?: string;
+  borrowedUntil?: Date;
+  reminderSent?: boolean;
 }
 
 export type LogAction = 'Registered' | 'Borrowed' | 'Returned' | 'Reported for Repair' | 'Repaired' | 'Deleted';

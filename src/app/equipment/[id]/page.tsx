@@ -21,6 +21,11 @@ function StatusBadge({ status }: { status: EquipmentStatus }) {
       : status === 'Borrowed'
       ? 'secondary'
       : 'destructive';
+
+   if (status === 'Reminder') {
+     return <Badge variant='destructive'>Due Soon</Badge>;
+   }
+
   return <Badge variant={variant}>{status}</Badge>;
 }
 
@@ -39,7 +44,7 @@ export default async function EquipmentDetailsPage({
     <div className="p-4 md:p-8 space-y-6">
       <header>
         <h1 className="text-3xl font-bold font-headline">{equipment.name}</h1>
-        <p className="text-muted-foreground">{equipment.model}</p>
+        <p className="text-muted-foreground">{equipment.brand} - {equipment.category}</p>
       </header>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -54,15 +59,25 @@ export default async function EquipmentDetailsPage({
                 <StatusBadge status={equipment.status} />
               </div>
               {equipment.status === 'Borrowed' && equipment.borrowedBy && (
-                 <div className="flex justify-between items-center">
-                    <span className="text-muted-foreground">Borrowed By</span>
-                    <span>{equipment.borrowedBy}</span>
-                </div>
+                 <>
+                  <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Borrowed By</span>
+                      <span>{equipment.borrowedBy}</span>
+                  </div>
+                   {equipment.borrowerPhone && (
+                     <div className="flex justify-between items-center">
+                       <span className="text-muted-foreground">Phone</span>
+                       <span>{equipment.borrowerPhone}</span>
+                     </div>
+                   )}
+                  {equipment.borrowedUntil && (
+                    <div className="flex justify-between items-center">
+                      <span className="text-muted-foreground">Return By</span>
+                      <span>{format(equipment.borrowedUntil, 'PPP')}</span>
+                    </div>
+                  )}
+                 </>
               )}
-              <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Purchase Date</span>
-                <span>{format(equipment.purchaseDate, 'PPP')}</span>
-              </div>
                <div className="flex justify-between items-center">
                 <span className="text-muted-foreground">Equipment ID</span>
                 <span className="font-mono text-sm">{equipment.id}</span>

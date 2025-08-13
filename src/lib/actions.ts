@@ -3,19 +3,20 @@
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
 import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getEquipmentById, updateEquipment } from './data';
+import { addDays } from 'date-fns';
 
 const equipmentSchema = z.object({
   name: z.string().min(3, 'Name must be at least 3 characters'),
-  model: z.string().min(2, 'Model must be at least 2 characters'),
-  purchaseDate: z.coerce.date(),
+  brand: z.string().min(2, 'Brand/Type must be at least 2 characters'),
+  category: z.string().min(2, 'Category must be at least 2 characters'),
 });
 
 export type FormState = {
   message: string;
   errors?: {
     name?: string[];
-    model?: string[];
-    purchaseDate?: string[];
+    brand?: string[];
+    category?: string[];
   };
   success?: boolean;
 };
@@ -26,8 +27,8 @@ export async function registerEquipment(
 ): Promise<FormState> {
   const validatedFields = equipmentSchema.safeParse({
     name: formData.get('name'),
-    model: formData.get('model'),
-    purchaseDate: formData.get('purchaseDate'),
+    brand: formData.get('brand'),
+    category: formData.get('category'),
   });
 
   if (!validatedFields.success) {
@@ -56,11 +57,24 @@ export async function registerEquipment(
   return { message: `Successfully added "${validatedFields.data.name}".`, success: true };
 }
 
-export async function checkoutEquipment(equipmentId: string, user: string, place: string, description: string) {
+export async function checkoutEquipment(
+  equipmentId: string,
+  user: string,
+  place: string,
+  description: string,
+  phone: string | undefined,
+  borrowedUntil: Date | undefined
+) {
   try {
-    const notes = `Place: ${place}. Purpose: ${description}`;
-    await updateEquipment(equipmentId, { status: 'Borrowed', borrowedBy: user });
+    const notes = `Place: ${place}. Purpose: ${description}.`;
+    const updateData: any = { status: 'Borrowed', borrowedBy: user, borrowerPhone: phone };
+    if (borrowedUntil) {
+      updateData.borrowedUntil = borrowedUntil;
+    }
+
+    await updateEquipment(equipmentId, updateData);
     await addLog({ equipmentId, action: 'Borrowed', user, notes });
+
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
     revalidatePath('/history');
@@ -77,7 +91,14 @@ export async function checkinEquipment(equipmentId: string) {
     if (equipment) {
       await addLog({ equipmentId, action: 'Returned', user: equipment.borrowedBy });
     }
-    await updateEquipment(equipmentId, { status: 'Available', borrowedBy: undefined });
+    // Reset borrow-related fields
+    await updateEquipment(equipmentId, { 
+      status: 'Available', 
+      borrowedBy: undefined, 
+      borrowerPhone: undefined,
+      borrowedUntil: undefined,
+      reminderSent: undefined,
+    });
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
     revalidatePath('/history');
@@ -151,4 +172,22 @@ export async function deleteEquipment(equipmentId: string) {
         const message = error instanceof Error ? error.message : 'Failed to delete equipment.';
         return { success: false, message };
     }
+}
+
+export async function checkReminders() {
+  console.log('Checking for reminders...');
+  const twoDaysFromNow = addDays(new Date(), 2);
+  const allEquipment = await getAllEquipment();
+  const borrowedItems = allEquipment.filter(e => e.status === 'Borrowed' && e.borrowedUntil && !e.reminderSent);
+
+  for (const item of borrowedItems) {
+    if (item.borrowedUntil && item.borrowedUntil <= twoDaysFromNow) {
+      console.log(`Sending reminder for ${item.name}`);
+      await updateEquipment(item.id, { status: 'Reminder', reminderSent: true });
+      // In a real app, you would also send an email or notification here.
+      // For this app, changing the status will serve as the reminder.
+      revalidatePath('/');
+      revalidatePath(`/equipment/${item.id}`);
+    }
+  }
 }

@@ -33,7 +33,7 @@ function docWithDates<T>(docData: any): T {
 // Data access functions
 export async function getAllEquipment(): Promise<Equipment[]> {
   try {
-    const q = query(collection(db, EQUIPMENT_COLLECTION), orderBy('purchaseDate', 'desc'));
+    const q = query(collection(db, EQUIPMENT_COLLECTION), orderBy('name', 'asc'));
     const querySnapshot = await getDocs(q);
     return querySnapshot.docs.map((doc) =>
       docWithDates<Equipment>({ ...doc.data(), id: doc.id })
@@ -94,7 +94,6 @@ export async function addEquipment(
     const newEquipmentData = {
         ...equipmentData,
         status: 'Available' as EquipmentStatus,
-        purchaseDate: Timestamp.fromDate(equipmentData.purchaseDate),
     }
   const docRef = await addDoc(collection(db, EQUIPMENT_COLLECTION), newEquipmentData);
   return { ...equipmentData, id: docRef.id, status: 'Available' };
@@ -105,9 +104,15 @@ export async function updateEquipment(
   updates: Partial<Omit<Equipment, 'id'>>
 ): Promise<Equipment | undefined> {
   const docRef = doc(db, EQUIPMENT_COLLECTION, id);
-  await updateDoc(docRef, updates);
+  // Convert Date objects to Firestore Timestamps before updating
+  const updatesWithTimestamps: { [key: string]: any } = { ...updates };
+  if (updates.borrowedUntil) {
+    updatesWithTimestamps.borrowedUntil = Timestamp.fromDate(updates.borrowedUntil);
+  }
+  await updateDoc(docRef, updatesWithTimestamps);
   return getEquipmentById(id);
 }
+
 
 export async function addLog(logData: Omit<LogEntry, 'id' | 'timestamp'>): Promise<LogEntry> {
   const newLog = {
@@ -131,7 +136,7 @@ export async function getHistoricalBorrowingDataString(): Promise<string> {
 
   const dataString = await Promise.all(logs.map(async (log) => {
     const equipment = await getEquipmentById(log.equipmentId);
-    return `User ${log.user || 'Unknown'} borrowed a ${equipment?.model || 'Unknown item'} (${
+    return `User ${log.user || 'Unknown'} borrowed a ${equipment?.brand || 'Unknown item'} (${
       equipment?.name || 'Unknown name'
     }) on ${log.timestamp.toDateString()}.`;
   }));
