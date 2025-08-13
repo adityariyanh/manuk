@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -16,6 +17,7 @@ import { useToast } from '@/hooks/use-toast';
 import { QrCode, Download } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
 import * as XLSX from 'xlsx';
+import { ScrollArea } from '@/components/ui/scroll-area';
 
 export default function QrCodesPage() {
   const [equipment, setEquipment] = useState<Equipment[]>([]);
@@ -108,52 +110,54 @@ export default function QrCodesPage() {
         </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
-        <div className="border rounded-lg overflow-x-auto">
-          <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="min-w-[200px]">Equipment Name</TableHead>
-                <TableHead className="min-w-[300px]">QR Code Action URL</TableHead>
-                <TableHead className="text-right w-[100px]">Copy</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {loading ? (
-                Array.from({ length: 5 }).map((_, i) => (
-                  <TableRow key={i}>
-                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                    <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                    <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                  </TableRow>
-                ))
-              ) : equipment.length > 0 ? (
-                equipment.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell className="font-mono text-sm">
-                      {getActionUrl(item.id)}
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => copyToClipboard(getActionUrl(item.id))}
-                      >
-                        Copy
-                      </Button>
-                    </TableCell>
-                  </TableRow>
-                ))
-              ) : (
+        <ScrollArea className="h-[calc(100vh-220px)]">
+          <div className="border rounded-lg overflow-x-auto">
+            <Table>
+              <TableHeader>
                 <TableRow>
-                  <TableCell colSpan={3} className="text-center h-24">
-                    No equipment found.
-                  </TableCell>
+                  <TableHead className="min-w-[200px]">Equipment Name</TableHead>
+                  <TableHead className="min-w-[300px]">QR Code Action URL</TableHead>
+                  <TableHead className="text-right w-[100px]">Copy</TableHead>
                 </TableRow>
-              )}
-            </TableBody>
-          </Table>
-        </div>
+              </TableHeader>
+              <TableBody>
+                {loading ? (
+                  Array.from({ length: 5 }).map((_, i) => (
+                    <TableRow key={i}>
+                      <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                      <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                      <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                    </TableRow>
+                  ))
+                ) : equipment.length > 0 ? (
+                  equipment.map((item) => (
+                    <TableRow key={item.id}>
+                      <TableCell className="font-medium">{item.name}</TableCell>
+                      <TableCell className="font-mono text-sm max-w-xs truncate">
+                        {getActionUrl(item.id)}
+                      </TableCell>
+                      <TableCell className="text-right">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          onClick={() => copyToClipboard(getActionUrl(item.id))}
+                        >
+                          Copy
+                        </Button>
+                      </TableCell>
+                    </TableRow>
+                  ))
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} className="text-center h-24">
+                      No equipment found.
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+            </Table>
+          </div>
+        </ScrollArea>
       </main>
     </div>
   );
