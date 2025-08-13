@@ -260,10 +260,3 @@ export default function EquipmentActionPage({ params }: PageProps) {
     </div>
   );
 }
-
-export async function generateStaticParams() {
-  const equipment = await getAllEquipment();
-  return equipment.map((item) => ({
-    id: item.id,
-  }));
-}
