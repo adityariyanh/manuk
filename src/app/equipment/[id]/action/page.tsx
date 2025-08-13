@@ -1,6 +1,6 @@
 
 import { notFound, redirect } from 'next/navigation';
-import { getEquipmentById } from '@/lib/data';
+import { getEquipmentById, getAllEquipment } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,13 @@ import { Textarea } from '@/components/ui/textarea';
 interface PageProps {
   params: { id: string };
   searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export async function generateStaticParams() {
+  const equipment = await getAllEquipment();
+  return equipment.map((item) => ({
+    id: item.id,
+  }));
 }
 
 export default async function EquipmentActionPage({ params }: PageProps) {
