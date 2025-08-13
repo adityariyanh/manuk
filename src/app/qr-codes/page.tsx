@@ -15,7 +15,6 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { QrCode, Download } from 'lucide-react';
 import { Skeleton } from '@/components/ui/skeleton';
-import { ScrollArea } from '@/components/ui/scroll-area';
 import * as XLSX from 'xlsx';
 
 export default function QrCodesPage() {
@@ -93,7 +92,7 @@ export default function QrCodesPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="p-4 border-b flex justify-between items-center">
+      <header className="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold font-headline flex items-center gap-2">
             <QrCode />
@@ -103,60 +102,58 @@ export default function QrCodesPage() {
             A list of all equipment and their direct action URLs for QR code generation.
           </p>
         </div>
-        <Button onClick={exportToCsv}>
+        <Button onClick={exportToCsv} className="w-full md:w-auto">
           <Download className="mr-2" />
           Export as CSV
         </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
-        <ScrollArea className="h-[calc(100vh-200px)]">
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>Equipment Name</TableHead>
-                  <TableHead>QR Code Action URL</TableHead>
-                  <TableHead className="text-right w-[100px]">Copy</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {loading ? (
-                  Array.from({ length: 5 }).map((_, i) => (
-                    <TableRow key={i}>
-                      <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
-                      <TableCell><Skeleton className="h-5 w-full" /></TableCell>
-                      <TableCell><Skeleton className="h-8 w-full" /></TableCell>
-                    </TableRow>
-                  ))
-                ) : equipment.length > 0 ? (
-                  equipment.map((item) => (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-medium">{item.name}</TableCell>
-                      <TableCell className="font-mono text-sm">
-                        {getActionUrl(item.id)}
-                      </TableCell>
-                      <TableCell className="text-right">
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          onClick={() => copyToClipboard(getActionUrl(item.id))}
-                        >
-                          Copy
-                        </Button>
-                      </TableCell>
-                    </TableRow>
-                  ))
-                ) : (
-                  <TableRow>
-                    <TableCell colSpan={3} className="text-center h-24">
-                      No equipment found.
+        <div className="border rounded-lg overflow-x-auto">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="min-w-[200px]">Equipment Name</TableHead>
+                <TableHead className="min-w-[300px]">QR Code Action URL</TableHead>
+                <TableHead className="text-right w-[100px]">Copy</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {loading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    <TableCell><Skeleton className="h-5 w-3/4" /></TableCell>
+                    <TableCell><Skeleton className="h-5 w-full" /></TableCell>
+                    <TableCell><Skeleton className="h-8 w-full" /></TableCell>
+                  </TableRow>
+                ))
+              ) : equipment.length > 0 ? (
+                equipment.map((item) => (
+                  <TableRow key={item.id}>
+                    <TableCell className="font-medium">{item.name}</TableCell>
+                    <TableCell className="font-mono text-sm">
+                      {getActionUrl(item.id)}
+                    </TableCell>
+                    <TableCell className="text-right">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => copyToClipboard(getActionUrl(item.id))}
+                      >
+                        Copy
+                      </Button>
                     </TableCell>
                   </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </div>
-        </ScrollArea>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={3} className="text-center h-24">
+                    No equipment found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
       </main>
     </div>
   );

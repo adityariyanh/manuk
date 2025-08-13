@@ -1,4 +1,5 @@
 
+
 import {
   Table,
   TableBody,
@@ -31,21 +32,21 @@ export default async function DashboardPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="p-4 border-b">
+      <header className="p-4 border-b hidden md:block">
         <h1 className="text-2xl font-bold font-headline">
           Equipment Dashboard
         </h1>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
         {equipment.length > 0 ? (
-          <div className="border rounded-lg">
+          <div className="border rounded-lg overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Name</TableHead>
-                  <TableHead>Model</TableHead>
+                  <TableHead className="min-w-[200px]">Name</TableHead>
+                  <TableHead className="min-w-[150px]">Model</TableHead>
                   <TableHead>Status</TableHead>
-                  <TableHead>Borrowed By</TableHead>
+                  <TableHead className="min-w-[150px]">Borrowed By</TableHead>
                   <TableHead className="w-[220px] text-right">
                     Actions
                   </TableHead>

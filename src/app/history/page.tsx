@@ -22,7 +22,7 @@ export default async function HistoryPage() {
 
   return (
     <div className="flex flex-col h-full">
-      <header className="p-4 border-b">
+      <header className="p-4 border-b hidden md:block">
         <h1 className="text-2xl font-bold font-headline flex items-center gap-2">
           <History />
           History Log
@@ -31,15 +31,15 @@ export default async function HistoryPage() {
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
         {logs.length > 0 ? (
-          <div className="border rounded-lg">
+          <div className="border rounded-lg overflow-x-auto">
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead>Equipment</TableHead>
+                  <TableHead className="min-w-[200px]">Equipment</TableHead>
                   <TableHead>Action</TableHead>
-                  <TableHead>User</TableHead>
-                  <TableHead>Notes</TableHead>
-                  <TableHead className="text-right">Date</TableHead>
+                  <TableHead className="min-w-[150px]">User</TableHead>
+                  <TableHead className="min-w-[250px]">Notes</TableHead>
+                  <TableHead className="text-right min-w-[150px]">Date</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>

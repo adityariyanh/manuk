@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -9,6 +10,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarInset,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import Link from 'next/link';
 import { Home, PlusCircle, Package, History, QrCode } from 'lucide-react';
@@ -55,9 +57,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </SidebarMenu>
         </SidebarContent>
       </Sidebar>
-      <main>
-        <SidebarInset>{children}</SidebarInset>
-      </main>
+      <SidebarInset>
+        <header className="p-4 flex items-center gap-4 md:hidden border-b sticky top-0 bg-background z-10">
+          <SidebarTrigger />
+          <h1 className="text-lg font-semibold">MANUK</h1>
+        </header>
+        {children}
+      </SidebarInset>
     </SidebarProvider>
   );
 }

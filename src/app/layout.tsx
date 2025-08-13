@@ -25,7 +25,7 @@ export default function RootLayout({
     <html lang="en" className="dark">
       <body className={`${roboto.variable} font-body antialiased`}>
         <AppShell>
-          <main>{children}</main>
+          {children}
         </AppShell>
         <Toaster />
       </body>
