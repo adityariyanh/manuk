@@ -1,3 +1,4 @@
+
 import {
   Card,
   CardContent,
@@ -16,6 +17,23 @@ import {
 import type { LogEntry } from '@/lib/types';
 import { format, formatDistanceToNow } from 'date-fns';
 
+function HistoryItem({ log }: { log: LogEntry }) {
+    return (
+        <div className="border-b p-4 space-y-2">
+            <div className='flex justify-between items-center'>
+                <span className="font-medium">{log.action}</span>
+                 <span className="text-sm text-muted-foreground" title={format(log.timestamp, 'PPP p')}>
+                    {formatDistanceToNow(log.timestamp, { addSuffix: true })}
+                </span>
+            </div>
+            <div className="text-sm text-muted-foreground space-y-1">
+                <p><strong>User:</strong> {log.user || 'N/A'}</p>
+                <p><strong>Notes:</strong> {log.notes || 'N/A'}</p>
+            </div>
+        </div>
+    )
+}
+
 export function HistoryTable({ logs }: { logs: LogEntry[] }) {
   return (
     <Card>
@@ -26,7 +44,21 @@ export function HistoryTable({ logs }: { logs: LogEntry[] }) {
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="border rounded-md">
+        {/* Mobile View */}
+        <div className="md:hidden">
+             {logs.length > 0 ? (
+                <div className="border rounded-md">
+                   {logs.map((log) => <HistoryItem key={log.id} log={log} />)}
+                </div>
+            ) : (
+                <div className="text-center py-12 text-muted-foreground">
+                    No history found for this item.
+                </div>
+            )}
+        </div>
+
+        {/* Desktop View */}
+        <div className="hidden md:block border rounded-md">
           <Table>
             <TableHeader>
               <TableRow>

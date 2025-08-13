@@ -49,9 +49,7 @@ export default async function DashboardPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead className="min-w-[150px] md:min-w-[200px]">Name</TableHead>
-                  <TableHead className="hidden md:table-cell min-w-[150px]">Model</TableHead>
-                  <TableHead>Status</TableHead>
-                  <TableHead className="hidden lg:table-cell min-w-[150px]">Borrowed By</TableHead>
+                  <TableHead className="hidden sm:table-cell">Status</TableHead>
                   <TableHead className="w-[120px] md:w-[220px] text-right">
                     Actions
                   </TableHead>
@@ -60,19 +58,18 @@ export default async function DashboardPage() {
               <TableBody>
                 {equipment.map((item) => (
                   <TableRow key={item.id}>
-                    <TableCell className="font-medium">{item.name}</TableCell>
-                    <TableCell className="hidden md:table-cell">{item.model}</TableCell>
-                    <TableCell>
+                    <TableCell className="font-medium">
+                      <div className="font-medium">{item.name}</div>
+                      <div className="text-sm text-muted-foreground md:hidden">{item.model}</div>
+                       <div className="sm:hidden mt-2">
+                        <StatusBadge status={item.status} />
+                      </div>
+                    </TableCell>
+                    <TableCell className="hidden sm:table-cell">
                       <StatusBadge status={item.status} />
                     </TableCell>
-                    <TableCell className="hidden lg:table-cell">{item.borrowedBy || 'N/A'}</TableCell>
                     <TableCell className="text-right">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button asChild variant="outline" size="sm">
-                          <Link href={`/equipment/${item.id}`}>Details</Link>
-                        </Button>
-                        <DashboardActions equipment={item} />
-                      </div>
+                      <DashboardActions equipment={item} />
                     </TableCell>
                   </TableRow>
                 ))}
