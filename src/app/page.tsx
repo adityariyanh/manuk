@@ -56,6 +56,7 @@ export default async function DashboardPage() {
               <TableHeader>
                 <TableRow>
                   <TableHead>Name</TableHead>
+                  <TableHead className="hidden md:table-cell">Model</TableHead>
                   <TableHead className="hidden sm:table-cell">Status</TableHead>
                   <TableHead className="text-right">
                     Actions
@@ -67,11 +68,12 @@ export default async function DashboardPage() {
                   <TableRow key={item.id}>
                     <TableCell className="font-medium">
                       <div className="font-medium">{item.name}</div>
-                      <div className="text-sm text-muted-foreground md:hidden">{item.brand}</div>
+                      <div className="text-sm text-muted-foreground md:hidden">{item.brand} - {item.model}</div>
                        <div className="sm:hidden mt-2">
                         <StatusBadge status={item.status} />
                       </div>
                     </TableCell>
+                    <TableCell className="hidden md:table-cell">{item.model}</TableCell>
                     <TableCell className="hidden sm:table-cell">
                       <StatusBadge status={item.status} />
                     </TableCell>
