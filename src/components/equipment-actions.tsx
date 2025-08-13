@@ -9,6 +9,7 @@ import {
   AlertDialogFooter,
   AlertDialogCancel,
   AlertDialogTrigger,
+  AlertDialogAction,
 } from '@/components/ui/alert-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
@@ -19,7 +20,7 @@ import {
 } from '@/lib/actions';
 import type { Equipment } from '@/lib/types';
 import { Loader2, Wrench, CheckCircle } from 'lucide-react';
-import { useEffect, useActionState, useRef, useState } from 'react';
+import { useEffect, useActionState, useRef, useState, useTransition } from 'react';
 import { useFormStatus } from 'react-dom';
 import { Textarea } from './ui/textarea';
 import { Label } from './ui/label';
@@ -27,47 +28,15 @@ import { Input } from './ui/input';
 
 function RepairForm({
   equipmentId,
-  closeDialog,
+  onFormSubmit,
 }: {
   equipmentId: string;
-  closeDialog: () => void;
+  onFormSubmit: (state: RepairState) => void;
 }) {
-  const { toast } = useToast();
-  const formRef = useRef<HTMLFormElement>(null);
-
-  const initialRepairState: RepairState = { message: '' };
-  const [repairState, repairDispatch] = useActionState(
-    reportForRepair,
-    initialRepairState
-  );
-
-  useEffect(() => {
-    if (repairState.success) {
-      toast({
-        title: 'Success',
-        description: repairState.message,
-      });
-      formRef.current?.reset();
-      closeDialog();
-    } else if (repairState.error) {
-      toast({
-        variant: 'destructive',
-        title: 'Repair Report Failed',
-        description: repairState.error,
-      });
-    }
-  }, [repairState, toast, closeDialog]);
-
   const { pending } = useFormStatus();
 
   return (
-    <form action={repairDispatch} ref={formRef}>
-      <AlertDialogHeader>
-        <AlertDialogTitle>Report for Repair</AlertDialogTitle>
-        <AlertDialogDescription>
-          Describe the issue to submit this equipment for repair.
-        </AlertDialogDescription>
-      </AlertDialogHeader>
+    <>
       <div className="py-4 space-y-4">
         <input type="hidden" name="equipmentId" value={equipmentId} />
         <div className="space-y-2">
@@ -92,46 +61,69 @@ function RepairForm({
         </div>
       </div>
       <AlertDialogFooter>
-        <AlertDialogCancel>Cancel</AlertDialogCancel>
+        <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
         <Button type="submit" variant="destructive" disabled={pending}>
           {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
           Confirm Report
         </Button>
       </AlertDialogFooter>
-    </form>
+    </>
   );
 }
 
 export function EquipmentActions({ equipment }: { equipment: Equipment }) {
   const { toast } = useToast();
-  const [isRepairing, startRepairTransition] = useActionState(async () => {
-    const result = await markAsRepaired(equipment.id);
-    if (result.success) {
-      toast({ title: 'Success', description: result.message });
-    } else {
-      toast({
-        variant: 'destructive',
-        title: 'Error',
-        description: result.message,
-      });
-    }
-  }, undefined);
+  const [isRepairing, startRepairTransition] = useTransition();
 
   const [isDialogOpen, setDialogOpen] = useState(false);
+  
+  const initialRepairState: RepairState = { message: '' };
+  const formRef = useRef<HTMLFormElement>(null);
+  
+  const handleRepairAction = async (formData: FormData) => {
+    const result = await reportForRepair(initialRepairState, formData);
+     if (result.success) {
+      toast({
+        title: 'Success',
+        description: result.message,
+      });
+      formRef.current?.reset();
+      setDialogOpen(false);
+    } else if (result.error) {
+      toast({
+        variant: 'destructive',
+        title: 'Repair Report Failed',
+        description: result.error,
+      });
+    }
+  }
+
+  const handleMarkAsRepaired = () => {
+    startRepairTransition(async () => {
+      const result = await markAsRepaired(equipment.id);
+      if (result.success) {
+        toast({ title: 'Success', description: result.message });
+      } else {
+        toast({
+          variant: 'destructive',
+          title: 'Error',
+          description: result.message,
+        });
+      }
+    });
+  };
 
   return (
     <div className="flex flex-wrap gap-2">
       {equipment.status === 'Under Repair' && (
-        <form action={startRepairTransition}>
-          <Button type="submit" disabled={!!isRepairing}>
-            {isRepairing ? (
-              <Loader2 className="mr-2 animate-spin" />
-            ) : (
-              <CheckCircle className="mr-2" />
-            )}
-            Mark as Repaired
-          </Button>
-        </form>
+        <Button onClick={handleMarkAsRepaired} disabled={isRepairing}>
+          {isRepairing ? (
+            <Loader2 className="mr-2 animate-spin" />
+          ) : (
+            <CheckCircle className="mr-2" />
+          )}
+          Mark as Repaired
+        </Button>
       )}
 
       {equipment.status !== 'Under Repair' && (
@@ -143,10 +135,15 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>
-            <RepairForm
-              equipmentId={equipment.id}
-              closeDialog={() => setDialogOpen(false)}
-            />
+             <form action={handleRepairAction} ref={formRef}>
+                <AlertDialogHeader>
+                    <AlertDialogTitle>Report for Repair</AlertDialogTitle>
+                    <AlertDialogDescription>
+                    Describe the issue to submit this equipment for repair.
+                    </AlertDialogDescription>
+                </AlertDialogHeader>
+                <RepairForm equipmentId={equipment.id} onFormSubmit={() => {}} />
+            </form>
           </AlertDialogContent>
         </AlertDialog>
       )}
