@@ -2,7 +2,7 @@
 
 import { revalidatePath } from 'next/cache';
 import { z } from 'zod';
-import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getEquipmentById, updateEquipment } from './data';
+import { addEquipment, addLog, deleteEquipment as deleteEquipmentData, getAllEquipment, getEquipmentById, updateEquipment } from './data';
 import { addDays } from 'date-fns';
 
 const equipmentSchema = z.object({
@@ -62,16 +62,19 @@ export async function checkoutEquipment(
   user: string,
   place: string,
   description: string,
-  phone: string | undefined,
-  borrowedUntil: Date | undefined
+  phone?: string,
+  borrowedUntil?: Date,
 ) {
   try {
     const notes = `Place: ${place}. Purpose: ${description}.`;
-    const updateData: any = { status: 'Borrowed', borrowedBy: user, borrowerPhone: phone };
-    if (borrowedUntil) {
-      updateData.borrowedUntil = borrowedUntil;
-    }
-
+    const updateData: Partial<Equipment> = { 
+      status: 'Borrowed', 
+      borrowedBy: user, 
+      borrowerPhone: phone || undefined,
+      borrowedUntil: borrowedUntil || undefined,
+      reminderSent: false,
+    };
+    
     await updateEquipment(equipmentId, updateData);
     await addLog({ equipmentId, action: 'Borrowed', user, notes });
 
@@ -174,20 +177,32 @@ export async function deleteEquipment(equipmentId: string) {
     }
 }
 
+
 export async function checkReminders() {
   console.log('Checking for reminders...');
   const twoDaysFromNow = addDays(new Date(), 2);
-  const allEquipment = await getAllEquipment();
-  const borrowedItems = allEquipment.filter(e => e.status === 'Borrowed' && e.borrowedUntil && !e.reminderSent);
+  
+  try {
+    const allEquipment = await getAllEquipment();
+    const borrowedItems = allEquipment.filter(e => 
+      e.status === 'Borrowed' && 
+      e.borrowedUntil && 
+      !e.reminderSent
+    );
 
-  for (const item of borrowedItems) {
-    if (item.borrowedUntil && item.borrowedUntil <= twoDaysFromNow) {
-      console.log(`Sending reminder for ${item.name}`);
-      await updateEquipment(item.id, { status: 'Reminder', reminderSent: true });
-      // In a real app, you would also send an email or notification here.
-      // For this app, changing the status will serve as the reminder.
-      revalidatePath('/');
-      revalidatePath(`/equipment/${item.id}`);
+    for (const item of borrowedItems) {
+      if (item.borrowedUntil && item.borrowedUntil <= twoDaysFromNow) {
+        console.log(`Reminder triggered for ${item.name}. Due on: ${item.borrowedUntil.toDateString()}`);
+        await updateEquipment(item.id, { status: 'Reminder', reminderSent: true });
+        // In a real app, you would also send an email or notification here.
+        // For this app, changing the status will serve as the reminder.
+        revalidatePath('/');
+        revalidatePath(`/equipment/${item.id}`);
+      }
     }
+     revalidatePath('/');
+     console.log('Reminder check complete.');
+  } catch (error) {
+      console.error("Error checking reminders:", error);
   }
 }

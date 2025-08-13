@@ -1,7 +1,7 @@
 'use client';
 
 import { notFound, redirect, useParams } from 'next/navigation';
-import { getEquipmentById } from '@/lib/data';
+import { getEquipmentById, getAllEquipment } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -18,8 +18,19 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { CalendarIcon } from 'lucide-react';
 import { addDays, format, type DateRange } from 'date-fns';
 
-export default function EquipmentActionPage() {
-  const params = useParams();
+interface PageProps {
+  params: { id: string };
+  searchParams: { [key: string]: string | string[] | undefined };
+}
+
+export async function generateStaticParams() {
+  const equipment = await getAllEquipment();
+  return equipment.map((item) => ({
+    id: item.id,
+  }));
+}
+
+export default function EquipmentActionPage({ params }: PageProps) {
   const id = params.id as string;
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
@@ -208,7 +219,7 @@ export default function EquipmentActionPage() {
                <h2 className="text-lg font-semibold">Check-in Item</h2>
                <p>This item is currently borrowed by <strong>{equipment.borrowedBy}</strong>.</p>
                 {equipment.borrowedUntil && (
-                    <p>It is due to be returned by <strong>{format(equipment.borrowedUntil, "PPP")}</strong>.</p>
+                    <p>It is due to be returned by <strong>{format(new Date(equipment.borrowedUntil), "PPP")}</strong>.</p>
                 )}
                <Button type="submit" className="w-full">
                 Confirm Check-in

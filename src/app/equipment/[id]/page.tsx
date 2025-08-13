@@ -1,4 +1,4 @@
-import { getEquipmentById, getLogsForEquipment } from '@/lib/data';
+import { getEquipmentById, getLogsForEquipment, getAllEquipment } from '@/lib/data';
 import { notFound } from 'next/navigation';
 import {
   Card,
@@ -13,6 +13,14 @@ import { QrCodeCard } from '@/components/qr-code';
 import { EquipmentActions } from '@/components/equipment-actions';
 import { HistoryTable } from '@/components/history-table';
 import { format } from 'date-fns';
+
+
+export async function generateStaticParams() {
+  const equipment = await getAllEquipment();
+  return equipment.map((item) => ({
+    id: item.id,
+  }));
+}
 
 function StatusBadge({ status }: { status: EquipmentStatus }) {
   const variant: 'default' | 'secondary' | 'destructive' =
@@ -58,7 +66,7 @@ export default async function EquipmentDetailsPage({
                 <span className="text-muted-foreground">Status</span>
                 <StatusBadge status={equipment.status} />
               </div>
-              {equipment.status === 'Borrowed' && equipment.borrowedBy && (
+              {(equipment.status === 'Borrowed' || equipment.status === 'Reminder') && equipment.borrowedBy && (
                  <>
                   <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Borrowed By</span>
@@ -73,7 +81,7 @@ export default async function EquipmentDetailsPage({
                   {equipment.borrowedUntil && (
                     <div className="flex justify-between items-center">
                       <span className="text-muted-foreground">Return By</span>
-                      <span>{format(equipment.borrowedUntil, 'PPP')}</span>
+                      <span>{format(new Date(equipment.borrowedUntil), 'PPP')}</span>
                     </div>
                   )}
                  </>

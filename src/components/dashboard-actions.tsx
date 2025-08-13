@@ -39,6 +39,7 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
+import { addDays } from 'date-fns';
 
 export function DashboardActions({ equipment }: { equipment: Equipment }) {
   const { toast } = useToast();
@@ -57,11 +58,14 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
       return;
     }
     startTransition(async () => {
+      // For direct checkout from dashboard, we assume a 1-day checkout
       const result = await checkoutEquipment(
         equipment.id,
         borrowerName,
         place,
-        description
+        description,
+        undefined, // No phone number field in this quick-checkout
+        addDays(new Date(), 1)
       );
       if (result.success) {
         toast({ title: 'Success', description: result.message });
@@ -137,7 +141,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
               <AlertDialogHeader>
                 <AlertDialogTitle>Checkout {equipment.name}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Enter the details below to borrow this item.
+                  Enter the details below to borrow this item for one day. For longer periods, go to the details page.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <div className="py-4 space-y-4">
@@ -148,6 +152,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
                     value={borrowerName}
                     onChange={(e) => setBorrowerName(e.target.value)}
                     placeholder="John Doe"
+                    required
                   />
                 </div>
                 <div className="space-y-2">
@@ -157,6 +162,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
                     value={place}
                     onChange={(e) => setPlace(e.target.value)}
                     placeholder="e.g. Room 201, Offsite Event"
+                     required
                   />
                 </div>
                 <div className="space-y-2">
@@ -166,6 +172,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
                     placeholder="Describe the purpose of borrowing this item..."
+                     required
                   />
                 </div>
               </div>
@@ -180,6 +187,7 @@ export function DashboardActions({ equipment }: { equipment: Equipment }) {
           </AlertDialog>
         );
       case 'Borrowed':
+      case 'Reminder':
         return (
           <Button size="sm" onClick={handleCheckin} disabled={isPending}>
             {isPending && <Loader2 className="mr-2 animate-spin" />}
