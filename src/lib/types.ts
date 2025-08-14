@@ -1,5 +1,5 @@
 
-export type EquipmentStatus = 'Available' | 'Borrowed' | 'Under Repair' | 'Follow Up';
+export type EquipmentStatus = 'Available' | 'Borrowed' | 'Under Repair' | 'Follow Up' | 'Reminder';
 
 export interface Equipment {
   id: string;

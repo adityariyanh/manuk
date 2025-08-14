@@ -1,7 +1,8 @@
+
 'use client';
 
-import { notFound, redirect, useParams } from 'next/navigation';
-import { getEquipmentById, getAllEquipment } from '@/lib/data';
+import { notFound, useParams, useRouter } from 'next/navigation';
+import { getEquipmentById } from '@/lib/data';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -15,8 +16,9 @@ import { Skeleton } from '@/components/ui/skeleton';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon } from 'lucide-react';
+import { CalendarIcon, Loader2 } from 'lucide-react';
 import { addDays, format, type DateRange } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface PageProps {
   params: { id: string };
@@ -26,8 +28,12 @@ interface PageProps {
 
 export default function EquipmentActionPage({ params }: PageProps) {
   const id = params.id as string;
+  const router = useRouter();
+  const { toast } = useToast();
+  
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const [borrowerName, setBorrowerName] = useState('');
   const [borrowerPhone, setBorrowerPhone] = useState('');
@@ -62,16 +68,34 @@ export default function EquipmentActionPage({ params }: PageProps) {
 
   async function handleCheckout(e: React.FormEvent) {
     e.preventDefault();
-    if (borrowerName) {
-      const borrowedUntil = isOneDayCheckout ? addDays(new Date(), 1) : dateRange?.to;
-      await checkoutEquipment(id, borrowerName, place, description, borrowerPhone, dateRange?.from, borrowedUntil);
-      redirect(`/equipment/${id}`);
+    if (!borrowerName || !place || !description) {
+      toast({ variant: 'destructive', title: 'Error', description: 'Please fill out all required fields.' });
+      return;
+    }
+
+    setIsSubmitting(true);
+    const borrowedUntil = isOneDayCheckout ? addDays(new Date(), 1) : dateRange?.to;
+    const result = await checkoutEquipment(id, borrowerName, place, description, borrowerPhone, dateRange?.from, borrowedUntil);
+
+    if (result.success) {
+      toast({ title: 'Success', description: result.message });
+      router.push(`/equipment/${id}`);
+    } else {
+      toast({ variant: 'destructive', title: 'Error', description: result.message });
+      setIsSubmitting(false);
     }
   }
 
   async function handleCheckin() {
-    await checkinEquipment(id);
-    redirect(`/equipment/${id}`);
+    setIsSubmitting(true);
+    const result = await checkinEquipment(id);
+    if (result.success) {
+      toast({ title: 'Success', description: result.message });
+      router.push(`/equipment/${id}`);
+    } else {
+      toast({ variant: 'destructive', title: 'Error', description: result.message });
+      setIsSubmitting(false);
+    }
   }
 
   if (loading || !equipment) {
@@ -112,6 +136,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                   required
                   value={borrowerName}
                   onChange={e => setBorrowerName(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -123,6 +148,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                   placeholder="e.g. 08123456789"
                   value={borrowerPhone}
                   onChange={e => setBorrowerPhone(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -135,6 +161,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                   required
                   value={place}
                   onChange={e => setPlace(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
               <div className="space-y-2">
@@ -146,6 +173,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                   required
                   value={description}
                   onChange={e => setDescription(e.target.value)}
+                  disabled={isSubmitting}
                 />
               </div>
 
@@ -154,6 +182,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                   id="one-day-checkout" 
                   checked={isOneDayCheckout}
                   onCheckedChange={(checked) => setIsOneDayCheckout(Boolean(checked))}
+                  disabled={isSubmitting}
                 />
                 <label
                   htmlFor="one-day-checkout"
@@ -172,6 +201,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                           <Button
                             variant={"outline"}
                             className="w-full justify-start text-left font-normal"
+                            disabled={isSubmitting}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {dateRange?.from ? format(dateRange.from, "LLL dd, y") : <span>Borrow Date</span>}
@@ -192,6 +222,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                            <Button
                             variant={"outline"}
                             className="w-full justify-start text-left font-normal"
+                            disabled={isSubmitting}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
                             {dateRange?.to ? format(dateRange.to, "LLL dd, y") : <span>Return Date</span>}
@@ -216,26 +247,29 @@ export default function EquipmentActionPage({ params }: PageProps) {
                       variant="ghost" 
                       className="w-full"
                       onClick={() => setDateRange(prev => ({...prev, from: new Date()}))}
+                      disabled={isSubmitting}
                     >
                       Set Borrow Date to Today
                     </Button>
                 </div>
               )}
 
-              <Button type="submit" className="w-full">
+              <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 animate-spin" />}
                 Confirm Checkout
               </Button>
             </form>
           )}
 
-          {(equipment.status === 'Borrowed' || equipment.status === 'Reminder') && (
+          {(equipment.status === 'Borrowed' || equipment.status === 'Follow Up' || equipment.status === 'Reminder') && (
             <form onSubmit={(e) => { e.preventDefault(); handleCheckin(); }} className="space-y-4">
                <h2 className="text-lg font-semibold">Check-in Item</h2>
                <p>This item is currently borrowed by <strong>{equipment.borrowedBy}</strong>.</p>
                 {equipment.borrowedUntil && (
                     <p>It is due to be returned by <strong>{format(new Date(equipment.borrowedUntil), "PPP")}</strong>.</p>
                 )}
-               <Button type="submit" className="w-full">
+               <Button type="submit" className="w-full" disabled={isSubmitting}>
+                {isSubmitting && <Loader2 className="mr-2 animate-spin" />}
                 Confirm Check-in
                </Button>
             </form>
