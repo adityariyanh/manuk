@@ -167,7 +167,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                   Masukkan detail di bawah ini untuk meminjam barang ini.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto pr-4">
+              <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto pr-6">
                 <div className="space-y-2">
                   <Label htmlFor="borrowerName">Nama Anda</Label>
                   <Input
