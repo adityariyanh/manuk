@@ -17,7 +17,7 @@ import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
 
 const equipmentSchema = z.object({
-  name: z.string().min(3, 'Name must be at least 3 characters'),
+  name: z.string().min(1, 'Name is required'),
   brand: z.string().min(2, 'Brand must be at least 2 characters'),
   model: z.string().min(1, 'Model is required'),
   category: z.string().min(2, 'Category must be at least 2 characters'),
