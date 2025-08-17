@@ -167,139 +167,141 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                   Masukkan detail di bawah ini untuk meminjam barang ini.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto pr-6">
-                <div className="space-y-2">
-                  <Label htmlFor="borrowerName">Nama Anda</Label>
-                  <Input
-                    id="borrowerName"
-                    value={borrowerName}
-                    onChange={(e) => setBorrowerName(e.target.value)}
-                    placeholder="John Doe"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="borrowerPhone">
-                    Nomor Telepon (Opsional)
-                  </Label>
-                  <Input
-                    id="borrowerPhone"
-                    name="borrowerPhone"
-                    placeholder="cth. 08123456789"
-                    value={borrowerPhone}
-                    onChange={(e) => setBorrowerPhone(e.target.value)}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="place">Tempat</Label>
-                  <Input
-                    id="place"
-                    value={place}
-                    onChange={(e) => setPlace(e.target.value)}
-                    placeholder="cth. Ruang 201, Acara Luar"
-                    required
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="description">Tujuan/Deskripsi</Label>
-                  <Textarea
-                    id="description"
-                    value={description}
-                    onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Jelaskan tujuan meminjam barang ini..."
-                    required
-                  />
-                </div>
-                <div className="flex items-center space-x-2">
-                  <Checkbox
-                    id="one-day-checkout-modal"
-                    checked={isOneDayCheckout}
-                    onCheckedChange={(checked) =>
-                      setIsOneDayCheckout(Boolean(checked))
-                    }
-                  />
-                  <label
-                    htmlFor="one-day-checkout-modal"
-                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                  >
-                    Pinjam 1 Hari (Kembali besok)
-                  </label>
-                </div>
-
-                {!isOneDayCheckout && (
+              <div className="py-4 max-h-[60vh] overflow-y-auto">
+                <div className='space-y-4 pr-4'>
                   <div className="space-y-2">
-                    <Label>Pilih Periode Pinjam</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={'outline'}
-                            className="w-full justify-start text-left font-normal"
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.from ? (
-                              format(dateRange.from, 'LLL dd, y')
-                            ) : (
-                              <span>Tanggal Pinjam</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={dateRange?.from}
-                            onSelect={(date) =>
-                              setDateRange((prev) => ({ ...prev, from: date }))
-                            }
-                            disabled={(date) =>
-                              date < new Date(new Date().setHours(0, 0, 0, 0))
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={'outline'}
-                            className="w-full justify-start text-left font-normal"
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.to ? (
-                              format(dateRange.to, 'LLL dd, y')
-                            ) : (
-                              <span>Tanggal Kembali</span>
-                            )}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={dateRange?.to}
-                            onSelect={(date) =>
-                              setDateRange((prev) => ({ ...prev, to: date }))
-                            }
-                            disabled={(date) =>
-                              (dateRange?.from && date < dateRange.from) ||
-                              date < new Date(new Date().setHours(0, 0, 0, 0))
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="ghost"
-                      className="w-full"
-                      onClick={() =>
-                        setDateRange((prev) => ({ ...prev, from: new Date() }))
-                      }
-                    >
-                      Atur Tanggal Pinjam ke Hari Ini
-                    </Button>
+                    <Label htmlFor="borrowerName">Nama Anda</Label>
+                    <Input
+                      id="borrowerName"
+                      value={borrowerName}
+                      onChange={(e) => setBorrowerName(e.target.value)}
+                      placeholder="John Doe"
+                      required
+                    />
                   </div>
-                )}
+                  <div className="space-y-2">
+                    <Label htmlFor="borrowerPhone">
+                      Nomor Telepon (Opsional)
+                    </Label>
+                    <Input
+                      id="borrowerPhone"
+                      name="borrowerPhone"
+                      placeholder="cth. 08123456789"
+                      value={borrowerPhone}
+                      onChange={(e) => setBorrowerPhone(e.target.value)}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="place">Tempat</Label>
+                    <Input
+                      id="place"
+                      value={place}
+                      onChange={(e) => setPlace(e.target.value)}
+                      placeholder="cth. Ruang 201, Acara Luar"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Tujuan/Deskripsi</Label>
+                    <Textarea
+                      id="description"
+                      value={description}
+                      onChange={(e) => setDescription(e.target.value)}
+                      placeholder="Jelaskan tujuan meminjam barang ini..."
+                      required
+                    />
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="one-day-checkout-modal"
+                      checked={isOneDayCheckout}
+                      onCheckedChange={(checked) =>
+                        setIsOneDayCheckout(Boolean(checked))
+                      }
+                    />
+                    <label
+                      htmlFor="one-day-checkout-modal"
+                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                    >
+                      Pinjam 1 Hari (Kembali besok)
+                    </label>
+                  </div>
+
+                  {!isOneDayCheckout && (
+                    <div className="space-y-2">
+                      <Label>Pilih Periode Pinjam</Label>
+                      <div className="grid grid-cols-2 gap-2">
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={'outline'}
+                              className="w-full justify-start text-left font-normal"
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {dateRange?.from ? (
+                                format(dateRange.from, 'LLL dd, y')
+                              ) : (
+                                <span>Tanggal Pinjam</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={dateRange?.from}
+                              onSelect={(date) =>
+                                setDateRange((prev) => ({ ...prev, from: date }))
+                              }
+                              disabled={(date) =>
+                                date < new Date(new Date().setHours(0, 0, 0, 0))
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant={'outline'}
+                              className="w-full justify-start text-left font-normal"
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {dateRange?.to ? (
+                                format(dateRange.to, 'LLL dd, y')
+                              ) : (
+                                <span>Tanggal Kembali</span>
+                              )}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={dateRange?.to}
+                              onSelect={(date) =>
+                                setDateRange((prev) => ({ ...prev, to: date }))
+                              }
+                              disabled={(date) =>
+                                (dateRange?.from && date < dateRange.from) ||
+                                date < new Date(new Date().setHours(0, 0, 0, 0))
+                              }
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                      </div>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        className="w-full"
+                        onClick={() =>
+                          setDateRange((prev) => ({ ...prev, from: new Date() }))
+                        }
+                      >
+                        Atur Tanggal Pinjam ke Hari Ini
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
               <AlertDialogFooter>
                 <AlertDialogCancel>Batal</AlertDialogCancel>
