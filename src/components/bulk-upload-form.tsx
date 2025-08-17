@@ -47,8 +47,11 @@ export function BulkUploadForm() {
         const workbook = XLSX.read(data, { type: 'array' });
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
+        
+        // Using `defval: ''` ensures empty cells are treated as empty strings
         const jsonData = XLSX.utils.sheet_to_json(worksheet, {
           header: 1,
+          defval: '',
         }) as any[][];
 
         if (jsonData.length < 2) {
