@@ -15,7 +15,7 @@ export interface Equipment {
   reminderSent?: boolean;
 }
 
-export type LogAction = 'Registered' | 'Borrowed' | 'Returned' | 'Reported for Repair' | 'Repaired' | 'Deleted';
+export type LogAction = 'Registered' | 'Borrowed' | 'Returned' | 'Reported for Repair' | 'Repaired' | 'Deleted' | 'Updated';
 
 export interface LogEntry {
   id: string;

@@ -14,6 +14,7 @@ import { QrCodeCard } from '@/components/qr-code';
 import { EquipmentActions } from '@/components/equipment-actions';
 import { HistoryTable } from '@/components/history-table';
 import { format } from 'date-fns';
+import { EditEquipmentForm } from '@/components/edit-equipment-form';
 
 
 export async function generateStaticParams() {
@@ -58,13 +59,24 @@ export default async function EquipmentDetailsPage({
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2 space-y-6">
-          <Card>
+          <EditEquipmentForm equipment={equipment} />
+           <Card>
             <CardHeader>
-              <CardTitle>Details</CardTitle>
+              <CardTitle>Actions</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <EquipmentActions equipment={equipment} />
+            </CardContent>
+          </Card>
+        </div>
+        <div className="space-y-6">
+           <Card>
+            <CardHeader>
+              <CardTitle>Status</CardTitle>
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Status</span>
+                <span className="text-muted-foreground">Current Status</span>
                 <StatusBadge status={equipment.status} />
               </div>
               {(equipment.status === 'Borrowed' || equipment.status === 'Follow Up') && equipment.borrowedBy && (
@@ -99,16 +111,6 @@ export default async function EquipmentDetailsPage({
               </div>
             </CardContent>
           </Card>
-           <Card>
-            <CardHeader>
-              <CardTitle>Actions</CardTitle>
-            </CardHeader>
-            <CardContent>
-              <EquipmentActions equipment={equipment} />
-            </CardContent>
-          </Card>
-        </div>
-        <div className="space-y-6">
           <QrCodeCard equipmentId={equipment.id} />
         </div>
       </div>

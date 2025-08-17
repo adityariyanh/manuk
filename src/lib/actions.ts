@@ -75,6 +75,34 @@ export async function registerEquipment(
   };
 }
 
+export async function updateEquipmentDetails(equipmentId: string, equipmentData: unknown) {
+    const validatedFields = equipmentSchema.safeParse(equipmentData);
+
+    if (!validatedFields.success) {
+        return {
+            success: false,
+            message: "Validation failed: " + validatedFields.error.flatten().fieldErrors,
+        };
+    }
+
+    try {
+        await updateEquipment(equipmentId, validatedFields.data);
+        await addLog({
+            equipmentId,
+            action: 'Updated',
+            user: 'Admin',
+            notes: 'Equipment details updated.'
+        });
+        revalidatePath('/');
+        revalidatePath(`/equipment/${equipmentId}`);
+        revalidatePath('/history');
+        return { success: true, message: 'Equipment updated successfully.' };
+    } catch (error) {
+        const message = error instanceof Error ? error.message : 'An unknown error occurred';
+        return { success: false, message: `Database Error: ${message}` };
+    }
+}
+
 const bulkEquipmentSchema = z.array(equipmentSchema);
 
 export async function bulkRegisterEquipment(equipmentData: unknown) {
