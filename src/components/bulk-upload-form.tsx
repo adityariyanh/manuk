@@ -1,3 +1,4 @@
+
 'use client';
 
 import { useState, useTransition } from 'react';
@@ -48,7 +49,6 @@ export function BulkUploadForm() {
         const sheetName = workbook.SheetNames[0];
         const worksheet = workbook.Sheets[sheetName];
         
-        // Using `defval: ''` ensures empty cells are treated as empty strings
         const jsonData = XLSX.utils.sheet_to_json(worksheet, {
           header: 1,
           defval: '',
@@ -72,7 +72,8 @@ export function BulkUploadForm() {
         const dataToUpload = jsonData.slice(1).map((row) => {
           const rowData: { [key: string]: any } = {};
           headers.forEach((header, index) => {
-            rowData[header] = row[index];
+             // Explicitly convert every value to a string to handle numbers from the spreadsheet
+            rowData[header] = String(row[index] ?? '');
           });
           return rowData;
         });
