@@ -27,16 +27,16 @@ export function BulkUploadForm() {
   const downloadTemplate = () => {
     const worksheet = XLSX.utils.aoa_to_sheet([REQUIRED_HEADERS]);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Equipment Template');
-    XLSX.writeFile(workbook, 'equipment_template.csv');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Templat Peralatan');
+    XLSX.writeFile(workbook, 'templat_peralatan.csv');
   };
 
   const handleUpload = () => {
     if (!file) {
       toast({
         variant: 'destructive',
-        title: 'No file selected',
-        description: 'Please select a file to upload.',
+        title: 'Tidak ada file dipilih',
+        description: 'Silakan pilih file untuk diunggah.',
       });
       return;
     }
@@ -55,7 +55,7 @@ export function BulkUploadForm() {
         }) as any[][];
 
         if (jsonData.length < 2) {
-          throw new Error("File is empty or doesn't contain data rows.");
+          throw new Error("File kosong atau tidak berisi baris data.");
         }
 
         const headers = jsonData[0].map((h) => String(h).toLowerCase().trim());
@@ -65,7 +65,7 @@ export function BulkUploadForm() {
 
         if (missingHeaders.length > 0) {
           throw new Error(
-            `Missing required headers: ${missingHeaders.join(', ')}`
+            `Header yang diperlukan tidak ada: ${missingHeaders.join(', ')}`
           );
         }
 
@@ -82,7 +82,7 @@ export function BulkUploadForm() {
           const result = await bulkRegisterEquipment(dataToUpload);
           if (result.success) {
             toast({
-              title: 'Upload Successful!',
+              title: 'Unggah Berhasil!',
               description: result.message,
             });
             setFile(null);
@@ -92,16 +92,16 @@ export function BulkUploadForm() {
           } else {
             toast({
               variant: 'destructive',
-              title: 'Upload Failed',
-              description: result.message || 'An unknown error occurred.',
+              title: 'Unggah Gagal',
+              description: result.message || 'Terjadi kesalahan yang tidak diketahui.',
             });
           }
         });
       } catch (error: any) {
         toast({
           variant: 'destructive',
-          title: 'Error processing file',
-          description: error.message || 'An unknown error occurred.',
+          title: 'Error memproses file',
+          description: error.message || 'Terjadi kesalahan yang tidak diketahui.',
         });
       }
     };
@@ -111,25 +111,25 @@ export function BulkUploadForm() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Bulk Upload Equipment</CardTitle>
+        <CardTitle>Unggah Massal Peralatan</CardTitle>
         <CardDescription>
-          Upload a CSV or XLSX file to add multiple equipment items at once.
+          Unggah file CSV atau XLSX untuk menambahkan beberapa item peralatan sekaligus.
         </CardDescription>
       </CardHeader>
       <CardContent className="space-y-6">
         <div className="space-y-2 p-4 border rounded-md bg-muted/50">
-           <h3 className="font-semibold">Step 1: Download Template</h3>
-           <p className="text-sm text-muted-foreground">Download the template file to ensure your data is in the correct format.</p>
+           <h3 className="font-semibold">Langkah 1: Unduh Templat</h3>
+           <p className="text-sm text-muted-foreground">Unduh file templat untuk memastikan data Anda dalam format yang benar.</p>
            <Button variant="outline" onClick={downloadTemplate} className='w-full sm:w-auto'>
               <Download className="mr-2" />
-              Download Template
+              Unduh Templat
             </Button>
         </div>
         <div className="space-y-2 p-4 border rounded-md bg-muted/50">
-            <h3 className="font-semibold">Step 2: Upload File</h3>
-            <p className="text-sm text-muted-foreground">Select the completed CSV or XLSX file from your computer.</p>
+            <h3 className="font-semibold">Langkah 2: Unggah File</h3>
+            <p className="text-sm text-muted-foreground">Pilih file CSV atau XLSX yang sudah selesai dari komputer Anda.</p>
             <div className="space-y-2">
-                <Label htmlFor="bulk-upload-input" className="sr-only">Choose File</Label>
+                <Label htmlFor="bulk-upload-input" className="sr-only">Pilih File</Label>
                 <Input
                     id="bulk-upload-input"
                     type="file"
@@ -140,7 +140,7 @@ export function BulkUploadForm() {
                 />
             </div>
             {file && (
-                <p className="text-sm text-muted-foreground">Selected file: {file.name}</p>
+                <p className="text-sm text-muted-foreground">File dipilih: {file.name}</p>
             )}
         </div>
       </CardContent>
@@ -151,7 +151,7 @@ export function BulkUploadForm() {
           ) : (
             <FileUp className="mr-2" />
           )}
-          Upload File
+          Unggah File
         </Button>
       </CardFooter>
     </Card>

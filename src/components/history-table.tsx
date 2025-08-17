@@ -23,9 +23,9 @@ export function HistoryTable({ logs }: { logs: LogEntry[] }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>History Log</CardTitle>
+        <CardTitle>Log Riwayat</CardTitle>
         <CardDescription>
-          A log of all activities for this piece of equipment.
+          Log semua aktivitas untuk peralatan ini.
         </CardDescription>
       </CardHeader>
       <CardContent>
@@ -37,7 +37,7 @@ export function HistoryTable({ logs }: { logs: LogEntry[] }) {
                 </div>
             ) : (
                 <div className="text-center py-12 text-muted-foreground">
-                    No history found for this item.
+                    Tidak ada riwayat ditemukan untuk item ini.
                 </div>
             )}
         </div>
@@ -47,10 +47,10 @@ export function HistoryTable({ logs }: { logs: LogEntry[] }) {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Action</TableHead>
-                <TableHead>User</TableHead>
-                <TableHead>Notes</TableHead>
-                <TableHead className="text-right">Date</TableHead>
+                <TableHead>Aksi</TableHead>
+                <TableHead>Pengguna</TableHead>
+                <TableHead>Catatan</TableHead>
+                <TableHead className="text-right">Tanggal</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -68,7 +68,7 @@ export function HistoryTable({ logs }: { logs: LogEntry[] }) {
               ) : (
                 <TableRow>
                   <TableCell colSpan={4} className="text-center h-24">
-                    No history found for this item.
+                    Tidak ada riwayat ditemukan untuk item ini.
                   </TableCell>
                 </TableRow>
               )}

@@ -25,10 +25,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const { user, logout, loading } = useAuth();
 
   const menuItems = [
-    { href: '/', label: 'Dashboard', icon: Home },
-    { href: '/equipment/new', label: 'Add Equipment', icon: PlusCircle },
-    { href: '/history', label: 'History', icon: History },
-    { href: '/qr-codes', label: 'QR Codes', icon: QrCode },
+    { href: '/', label: 'Dasbor', icon: Home },
+    { href: '/equipment/new', label: 'Tambah Peralatan', icon: PlusCircle },
+    { href: '/history', label: 'Riwayat', icon: History },
+    { href: '/qr-codes', label: 'Kode QR', icon: QrCode },
   ];
   
   return (
@@ -69,7 +69,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             </SidebarMenu>
           ) : (
             <div className="p-4 text-sm text-muted-foreground">
-              Please log in to manage equipment.
+              Silakan login untuk mengelola peralatan.
             </div>
           )}
         </SidebarContent>
@@ -77,7 +77,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
            <SidebarFooter>
               <Button variant="ghost" onClick={logout} className="w-full justify-start">
                 <LogOut className="mr-2" />
-                Logout
+                Keluar
               </Button>
             </SidebarFooter>
          )}

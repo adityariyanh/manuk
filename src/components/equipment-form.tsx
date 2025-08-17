@@ -16,7 +16,7 @@ function SubmitButton() {
   return (
     <Button type="submit" disabled={pending} className="w-full sm:w-auto">
       {pending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-      Add Equipment
+      Tambah Peralatan
     </Button>
   );
 }
@@ -30,7 +30,7 @@ export function EquipmentForm() {
   useEffect(() => {
     if (state.success) {
       toast({
-        title: 'Success!',
+        title: 'Sukses!',
         description: state.message,
       });
       formRef.current?.reset();
@@ -38,8 +38,8 @@ export function EquipmentForm() {
         const errorFields = Object.keys(state.errors).join(', ');
         toast({
             variant: "destructive",
-            title: "Error adding equipment",
-            description: `${state.message} Please correct the following fields: ${errorFields}`
+            title: "Error menambah peralatan",
+            description: `${state.message} Mohon perbaiki bidang berikut: ${errorFields}`
         });
     } else if (state.message) {
       toast({
@@ -55,29 +55,29 @@ export function EquipmentForm() {
       <Card>
         <CardContent className="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Equipment Name</Label>
-            <Input id="name" name="name" placeholder="e.g. Canon EOS R5" required />
+            <Label htmlFor="name">Nama Peralatan</Label>
+            <Input id="name" name="name" placeholder="cth. Canon EOS R5" required />
             {state.errors?.name && (
               <p className="text-sm text-destructive">{state.errors.name[0]}</p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="brand">Brand</Label>
-            <Input id="brand" name="brand" placeholder="e.g. Canon" required />
+            <Label htmlFor="brand">Merek</Label>
+            <Input id="brand" name="brand" placeholder="cth. Canon" required />
             {state.errors?.brand && (
               <p className="text-sm text-destructive">{state.errors.brand[0]}</p>
             )}
           </div>
           <div className="space-y-2">
             <Label htmlFor="model">Model</Label>
-            <Input id="model" name="model" placeholder="e.g. EOS R5" required />
+            <Input id="model" name="model" placeholder="cth. EOS R5" required />
             {state.errors?.model && (
               <p className="text-sm text-destructive">{state.errors.model[0]}</p>
             )}
           </div>
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
-            <Input id="category" name="category" placeholder="e.g. Photography, Audio" required />
+            <Label htmlFor="category">Kategori</Label>
+            <Input id="category" name="category" placeholder="cth. Fotografi, Audio" required />
             {state.errors?.category && (
               <p className="text-sm text-destructive">{state.errors.category[0]}</p>
             )}

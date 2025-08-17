@@ -50,15 +50,15 @@ function RepairForm({
   return (
     <form onSubmit={handleSubmit} ref={formRef}>
       <AlertDialogHeader>
-        <AlertDialogTitle>Report for Repair</AlertDialogTitle>
+        <AlertDialogTitle>Laporkan untuk Perbaikan</AlertDialogTitle>
         <AlertDialogDescription>
-          Describe the issue to submit this equipment for repair.
+          Jelaskan masalahnya untuk mengajukan perbaikan peralatan ini.
         </AlertDialogDescription>
       </AlertDialogHeader>
       <div className="py-4 space-y-4">
         <input type="hidden" name="equipmentId" value={equipmentId} />
         <div className="space-y-2">
-          <Label htmlFor="userName">Your Name</Label>
+          <Label htmlFor="userName">Nama Anda</Label>
           <Input
             id="userName"
             name="userName"
@@ -68,21 +68,21 @@ function RepairForm({
           />
         </div>
         <div className="space-y-2">
-          <Label htmlFor="problem">Problem Description</Label>
+          <Label htmlFor="problem">Deskripsi Masalah</Label>
           <Textarea
             id="problem"
             name="problem"
-            placeholder="Describe the issue with the equipment..."
+            placeholder="Jelaskan masalah dengan peralatan..."
             required
             disabled={isPending}
           />
         </div>
       </div>
       <AlertDialogFooter>
-        <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+        <AlertDialogCancel disabled={isPending}>Batal</AlertDialogCancel>
         <Button type="submit" variant="destructive" disabled={isPending}>
           {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-          Confirm Report
+          Konfirmasi Laporan
         </Button>
       </AlertDialogFooter>
     </form>
@@ -98,14 +98,14 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
   const handleFormSubmit = (result: RepairState) => {
      if (result.success) {
       toast({
-        title: 'Success',
+        title: 'Sukses',
         description: result.message,
       });
       setDialogOpen(false);
     } else if (result.error) {
       toast({
         variant: 'destructive',
-        title: 'Repair Report Failed',
+        title: 'Laporan Perbaikan Gagal',
         description: result.error,
       });
     }
@@ -115,7 +115,7 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
     startRepairTransition(async () => {
       const result = await markAsRepaired(equipment.id);
       if (result.success) {
-        toast({ title: 'Success', description: result.message });
+        toast({ title: 'Sukses', description: result.message });
       } else {
         toast({
           variant: 'destructive',
@@ -135,7 +135,7 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
           ) : (
             <CheckCircle className="mr-2" />
           )}
-          Mark as Repaired
+          Tandai Selesai Diperbaiki
         </Button>
       )}
 
@@ -144,7 +144,7 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
           <AlertDialogTrigger asChild>
             <Button variant="destructive">
               <Wrench className="mr-2" />
-              Report for Repair
+              Lapor Perbaikan
             </Button>
           </AlertDialogTrigger>
           <AlertDialogContent>

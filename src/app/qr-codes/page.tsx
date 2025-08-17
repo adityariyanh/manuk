@@ -33,11 +33,11 @@ export default function QrCodesPage() {
         const data = await getAllEquipment();
         setEquipment(data);
       } catch (error) {
-        console.error('Failed to fetch equipment', error);
+        console.error('Gagal mengambil peralatan', error);
         toast({
           variant: 'destructive',
           title: 'Error',
-          description: 'Failed to load equipment data.',
+          description: 'Gagal memuat data peralatan.',
         });
       } finally {
         setLoading(false);
@@ -57,16 +57,16 @@ export default function QrCodesPage() {
     navigator.clipboard.writeText(text).then(
       () => {
         toast({
-          title: 'Copied!',
-          description: 'URL copied to clipboard.',
+          title: 'Tersalin!',
+          description: 'URL disalin ke clipboard.',
         });
       },
       (err) => {
-        console.error('Could not copy text: ', err);
+        console.error('Tidak dapat menyalin teks: ', err);
         toast({
           variant: 'destructive',
           title: 'Error',
-          description: 'Failed to copy URL.',
+          description: 'Gagal menyalin URL.',
         });
       }
     );
@@ -76,23 +76,23 @@ export default function QrCodesPage() {
     if (!equipment.length) {
       toast({
         variant: 'destructive',
-        title: 'No Data',
-        description: 'There is no data to export.',
+        title: 'Tidak Ada Data',
+        description: 'Tidak ada data untuk diekspor.',
       });
       return;
     }
 
     const dataToExport = equipment.map((item) => ({
-      'Equipment Name': item.name,
-      'QR Code Action URL': getActionUrl(item.id),
+      'Nama Peralatan': item.name,
+      'URL Aksi Kode QR': getActionUrl(item.id),
       'Status': item.status,
       'Model': item.model,
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'Equipment QR Codes');
-    XLSX.writeFile(workbook, 'equipment_qr_codes.csv');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Kode QR Peralatan');
+    XLSX.writeFile(workbook, 'kode_qr_peralatan.csv');
   };
 
   return (
@@ -101,15 +101,15 @@ export default function QrCodesPage() {
         <div>
           <h1 className="text-2xl font-bold font-headline flex items-center gap-2">
             <QrCode />
-            Equipment QR Code URLs
+            URL Kode QR Peralatan
           </h1>
           <p className="text-muted-foreground">
-            A list of all equipment and their direct action URLs for QR code generation.
+            Daftar semua peralatan dan URL aksi langsung mereka untuk pembuatan kode QR.
           </p>
         </div>
         <Button onClick={exportToCsv} className="w-full md:w-auto">
           <Download className="mr-2" />
-          Export as CSV
+          Ekspor sebagai CSV
         </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
@@ -117,9 +117,9 @@ export default function QrCodesPage() {
             <Table>
               <TableHeader>
                 <TableRow>
-                  <TableHead className="min-w-[150px]">Equipment Name</TableHead>
-                  <TableHead className="hidden md:table-cell min-w-[300px]">QR Code Action URL</TableHead>
-                  <TableHead className="text-right w-[100px]">Action</TableHead>
+                  <TableHead className="min-w-[150px]">Nama Peralatan</TableHead>
+                  <TableHead className="hidden md:table-cell min-w-[300px]">URL Aksi Kode QR</TableHead>
+                  <TableHead className="text-right w-[100px]">Aksi</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -146,7 +146,7 @@ export default function QrCodesPage() {
                           disabled={!origin}
                         >
                           <Copy className="md:mr-2" />
-                          <span className='hidden md:inline'>Copy</span>
+                          <span className='hidden md:inline'>Salin</span>
                         </Button>
                       </TableCell>
                     </TableRow>
@@ -154,7 +154,7 @@ export default function QrCodesPage() {
                 ) : (
                   <TableRow>
                     <TableCell colSpan={3} className="text-center h-24">
-                      No equipment found.
+                      Tidak ada peralatan ditemukan.
                     </TableCell>
                   </TableRow>
                 )}

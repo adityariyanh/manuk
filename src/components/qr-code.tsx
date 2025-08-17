@@ -21,8 +21,8 @@ export function QrCodeCard({ equipmentId }: { equipmentId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>QR Code</CardTitle>
-        <CardDescription>Scan to take action on this item.</CardDescription>
+        <CardTitle>Kode QR</CardTitle>
+        <CardDescription>Pindai untuk melakukan aksi pada item ini.</CardDescription>
       </CardHeader>
       <CardContent className="flex justify-center items-center p-6">
         {qrCodeUrl ? (

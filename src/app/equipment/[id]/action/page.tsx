@@ -69,7 +69,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
   async function handleCheckout(e: React.FormEvent) {
     e.preventDefault();
     if (!borrowerName || !place || !description) {
-      toast({ variant: 'destructive', title: 'Error', description: 'Please fill out all required fields.' });
+      toast({ variant: 'destructive', title: 'Error', description: 'Silakan isi semua bidang yang wajib diisi.' });
       return;
     }
 
@@ -78,7 +78,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
     const result = await checkoutEquipment(id, borrowerName, place, description, borrowerPhone, dateRange?.from, borrowedUntil);
 
     if (result.success) {
-      toast({ title: 'Success', description: result.message });
+      toast({ title: 'Sukses', description: result.message });
       router.push(`/equipment/${id}`);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
@@ -90,7 +90,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
     setIsSubmitting(true);
     const result = await checkinEquipment(id);
     if (result.success) {
-      toast({ title: 'Success', description: result.message });
+      toast({ title: 'Sukses', description: result.message });
       router.push(`/equipment/${id}`);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
@@ -125,10 +125,10 @@ export default function EquipmentActionPage({ params }: PageProps) {
         <CardContent>
           {equipment.status === 'Available' && (
             <form onSubmit={handleCheckout} className="space-y-4">
-              <h2 className="text-lg font-semibold">Checkout Item</h2>
+              <h2 className="text-lg font-semibold">Pinjam Barang</h2>
               
               <div className="space-y-2">
-                <Label htmlFor="borrowerName">Your Name</Label>
+                <Label htmlFor="borrowerName">Nama Anda</Label>
                 <Input
                   id="borrowerName"
                   name="borrowerName"
@@ -141,11 +141,11 @@ export default function EquipmentActionPage({ params }: PageProps) {
               </div>
 
                <div className="space-y-2">
-                <Label htmlFor="borrowerPhone">Phone Number (Optional)</Label>
+                <Label htmlFor="borrowerPhone">Nomor Telepon (Opsional)</Label>
                 <Input
                   id="borrowerPhone"
                   name="borrowerPhone"
-                  placeholder="e.g. 08123456789"
+                  placeholder="cth. 08123456789"
                   value={borrowerPhone}
                   onChange={e => setBorrowerPhone(e.target.value)}
                   disabled={isSubmitting}
@@ -153,11 +153,11 @@ export default function EquipmentActionPage({ params }: PageProps) {
               </div>
 
                <div className="space-y-2">
-                <Label htmlFor="place">Place</Label>
+                <Label htmlFor="place">Tempat</Label>
                 <Input
                   id="place"
                   name="place"
-                  placeholder="e.g. Room 201, Offsite Event"
+                  placeholder="cth. Ruang 201, Acara di Luar"
                   required
                   value={place}
                   onChange={e => setPlace(e.target.value)}
@@ -165,11 +165,11 @@ export default function EquipmentActionPage({ params }: PageProps) {
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="description">Purpose/Description</Label>
+                <Label htmlFor="description">Tujuan/Deskripsi</Label>
                 <Textarea
                   id="description"
                   name="description"
-                  placeholder="Describe the purpose of borrowing this item..."
+                  placeholder="Jelaskan tujuan meminjam barang ini..."
                   required
                   value={description}
                   onChange={e => setDescription(e.target.value)}
@@ -188,13 +188,13 @@ export default function EquipmentActionPage({ params }: PageProps) {
                   htmlFor="one-day-checkout"
                   className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                 >
-                  1-Day Checkout (Return tomorrow)
+                  Pinjam 1 Hari (Kembali besok)
                 </label>
               </div>
 
               {!isOneDayCheckout && (
                 <div className="space-y-2">
-                   <Label>Select Borrowing Period</Label>
+                   <Label>Pilih Periode Peminjaman</Label>
                    <div className="grid grid-cols-2 gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
@@ -204,7 +204,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                             disabled={isSubmitting}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.from ? format(dateRange.from, "LLL dd, y") : <span>Borrow Date</span>}
+                            {dateRange?.from ? format(dateRange.from, "LLL dd, y") : <span>Tanggal Pinjam</span>}
                           </Button>
                         </PopoverTrigger>
                         <PopoverContent className="w-auto p-0" align="start">
@@ -225,7 +225,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
                             disabled={isSubmitting}
                           >
                             <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.to ? format(dateRange.to, "LLL dd, y") : <span>Return Date</span>}
+                            {dateRange?.to ? format(dateRange.to, "LLL dd, y") : <span>Tanggal Kembali</span>}
                           </Button>
                         </PopoverTrigger>
                          <PopoverContent className="w-auto p-0" align="start">
@@ -249,44 +249,44 @@ export default function EquipmentActionPage({ params }: PageProps) {
                       onClick={() => setDateRange(prev => ({...prev, from: new Date()}))}
                       disabled={isSubmitting}
                     >
-                      Set Borrow Date to Today
+                      Atur Tanggal Pinjam ke Hari Ini
                     </Button>
                 </div>
               )}
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 animate-spin" />}
-                Confirm Checkout
+                Konfirmasi Pinjam
               </Button>
             </form>
           )}
 
           {(equipment.status === 'Borrowed' || equipment.status === 'Follow Up' || equipment.status === 'Reminder') && (
             <form onSubmit={(e) => { e.preventDefault(); handleCheckin(); }} className="space-y-4">
-               <h2 className="text-lg font-semibold">Check-in Item</h2>
-               <p>This item is currently borrowed by <strong>{equipment.borrowedBy}</strong>.</p>
+               <h2 className="text-lg font-semibold">Kembalikan Barang</h2>
+               <p>Barang ini sedang dipinjam oleh <strong>{equipment.borrowedBy}</strong>.</p>
                 {equipment.borrowedUntil && (
-                    <p>It is due to be returned by <strong>{format(new Date(equipment.borrowedUntil), "PPP")}</strong>.</p>
+                    <p>Jatuh tempo pengembalian pada <strong>{format(new Date(equipment.borrowedUntil), "PPP")}</strong>.</p>
                 )}
                <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 animate-spin" />}
-                Confirm Check-in
+                Konfirmasi Kembali
                </Button>
             </form>
           )}
 
           {equipment.status === 'Under Repair' && (
             <div className="text-center space-y-4">
-               <h2 className="text-lg font-semibold text-destructive">Item Under Repair</h2>
-               <p>This item is currently under repair and cannot be checked out.</p>
+               <h2 className="text-lg font-semibold text-destructive">Barang Sedang Diperbaiki</h2>
+               <p>Barang ini sedang dalam perbaikan dan tidak dapat dipinjam.</p>
                 <Button asChild variant="outline">
-                    <Link href={`/equipment/${id}`}>View Details</Link>
+                    <Link href={`/equipment/${id}`}>Lihat Detail</Link>
                 </Button>
             </div>
           )}
            <div className="mt-4 text-center">
             <Button asChild variant="link">
-              <Link href={`/equipment/${id}`}>Back to Details</Link>
+              <Link href={`/equipment/${id}`}>Kembali ke Detail</Link>
             </Button>
           </div>
         </CardContent>

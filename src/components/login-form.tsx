@@ -41,8 +41,8 @@ export function LoginForm() {
     if (!email || !password) {
       toast({
         variant: 'destructive',
-        title: 'Login Failed',
-        description: 'Email and password cannot be empty.',
+        title: 'Login Gagal',
+        description: 'Email dan password tidak boleh kosong.',
       });
       return;
     }
@@ -51,28 +51,28 @@ export function LoginForm() {
       try {
         await signInWithEmailAndPassword(auth, email, password);
         toast({
-          title: 'Login Successful!',
-          description: 'Redirecting to your dashboard...',
+          title: 'Login Berhasil!',
+          description: 'Mengarahkan ke dasbor Anda...',
         });
         // The redirect is handled by the useAuth hook and the main page component
       } catch (error: any) {
-        let errorMessage = 'An unknown error occurred.';
+        let errorMessage = 'Terjadi kesalahan yang tidak diketahui.';
          switch (error.code) {
             case 'auth/user-not-found':
             case 'auth/wrong-password':
             case 'auth/invalid-credential':
-              errorMessage = 'Invalid email or password.';
+              errorMessage = 'Email atau password salah.';
               break;
             case 'auth/invalid-email':
-              errorMessage = 'Please enter a valid email address.';
+              errorMessage = 'Silakan masukkan alamat email yang valid.';
               break;
             default:
-              errorMessage = 'Failed to login. Please try again later.';
+              errorMessage = 'Gagal login. Silakan coba lagi nanti.';
               break;
           }
         toast({
           variant: "destructive",
-          title: "Login Failed",
+          title: "Login Gagal",
           description: errorMessage,
         });
       }
@@ -85,10 +85,10 @@ export function LoginForm() {
         <form onSubmit={handleSubmit}>
           <CardHeader className="text-center">
             <CardTitle className="text-2xl font-bold font-headline">
-              Admin Login
+              Login Admin
             </CardTitle>
             <CardDescription>
-              Enter your credentials to access the dashboard.
+              Masukkan kredensial Anda untuk mengakses dasbor.
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">

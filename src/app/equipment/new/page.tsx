@@ -9,16 +9,16 @@ export default function NewEquipmentPage() {
     <div className="p-4 md:p-8">
       <header className="mb-8">
         <h1 className="text-3xl font-bold font-headline">
-          Register New Equipment
+          Daftarkan Peralatan Baru
         </h1>
         <p className="text-muted-foreground">
-          Fill in the details below or use the bulk upload feature.
+          Isi detail di bawah ini atau gunakan fitur unggah massal.
         </p>
       </header>
       <Tabs defaultValue="single">
         <TabsList className="grid w-full grid-cols-2 md:w-[400px]">
-          <TabsTrigger value="single">Single Item</TabsTrigger>
-          <TabsTrigger value="bulk">Bulk Upload</TabsTrigger>
+          <TabsTrigger value="single">Satu Barang</TabsTrigger>
+          <TabsTrigger value="bulk">Unggah Massal</TabsTrigger>
         </TabsList>
         <TabsContent value="single">
           <EquipmentForm />

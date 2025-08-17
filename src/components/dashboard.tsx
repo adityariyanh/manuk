@@ -50,7 +50,7 @@ export function Dashboard() {
       toast({
         variant: 'destructive',
         title: 'Error',
-        description: 'Failed to load dashboard data.',
+        description: 'Gagal memuat data dasbor.',
       });
     } finally {
       setLoading(false);
@@ -84,14 +84,14 @@ export function Dashboard() {
       <header className="p-4 border-b flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div>
           <h1 className="text-2xl font-bold font-headline">
-            Equipment Dashboard
+            Dasbor Peralatan
           </h1>
           <p className="text-muted-foreground">
-            An overview of all equipment in the inventory.
+            Gambaran umum semua peralatan dalam inventaris.
           </p>
         </div>
         <Button asChild>
-          <Link href="/equipment/new">Add Equipment</Link>
+          <Link href="/equipment/new">Tambah Peralatan</Link>
         </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
@@ -106,10 +106,11 @@ export function Dashboard() {
                   <Table>
                     <TableHeader>
                       <TableRow>
-                        <TableHead className="w-[60%]">Name</TableHead>
+                        <TableHead className="w-[40%]">Nama</TableHead>
                         <TableHead className="w-[120px]">Status</TableHead>
+                        <TableHead className="w-[20%]">Peminjam</TableHead>
                         <TableHead className="text-right w-[150px]">
-                          Actions
+                          Aksi
                         </TableHead>
                       </TableRow>
                     </TableHeader>
@@ -125,6 +126,13 @@ export function Dashboard() {
                           <TableCell>
                             <StatusBadge status={item.status} />
                           </TableCell>
+                          <TableCell>
+                             {(item.status === 'Borrowed' || item.status === 'Follow Up' || item.status === 'Reminder') && item.borrowedBy ? (
+                              <div className="truncate">{item.borrowedBy}</div>
+                            ) : (
+                              <div className="text-muted-foreground">-</div>
+                            )}
+                          </TableCell>
                           <TableCell className="text-right">
                             <DashboardActions equipment={item} onActionSuccess={fetchData} />
                           </TableCell>
@@ -139,12 +147,12 @@ export function Dashboard() {
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground bg-card rounded-lg p-8">
             <Package className="w-16 h-16 mb-4" />
-            <h2 className="text-2xl font-bold">No Equipment Found</h2>
+            <h2 className="text-2xl font-bold">Tidak Ada Peralatan Ditemukan</h2>
             <p className="max-w-md mt-2">
-              Get started by adding your first piece of equipment.
+              Mulailah dengan menambahkan peralatan pertama Anda.
             </p>
             <Button asChild className="mt-6">
-              <Link href="/equipment/new">Add Equipment</Link>
+              <Link href="/equipment/new">Tambah Peralatan</Link>
             </Button>
           </div>
         )}

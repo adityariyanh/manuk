@@ -65,8 +65,8 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
     if (!borrowerName.trim() || !place.trim() || !description.trim()) {
       toast({
         variant: 'destructive',
-        title: 'Checkout Error',
-        description: 'Name, Place, and Purpose are required.',
+        title: 'Error Pinjam',
+        description: 'Nama, Tempat, dan Tujuan wajib diisi.',
       });
       return;
     }
@@ -84,7 +84,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
         borrowedUntil
       );
       if (result.success) {
-        toast({ title: 'Success', description: result.message });
+        toast({ title: 'Sukses', description: result.message });
         setBorrowerName('');
         setPlace('');
         setBorrowerPhone('');
@@ -106,7 +106,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
     startTransition(async () => {
       const result = await checkinEquipment(equipment.id);
       if (result.success) {
-        toast({ title: 'Success', description: result.message });
+        toast({ title: 'Sukses', description: result.message });
         onActionSuccess();
       } else {
         toast({
@@ -122,7 +122,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
     startTransition(async () => {
       const result = await markAsRepaired(equipment.id);
       if (result.success) {
-        toast({ title: 'Success', description: result.message });
+        toast({ title: 'Sukses', description: result.message });
         onActionSuccess();
       } else {
         toast({
@@ -138,7 +138,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
     startTransition(async () => {
       const result = await deleteEquipment(equipment.id);
       if (result.success) {
-        toast({ title: 'Success', description: result.message });
+        toast({ title: 'Sukses', description: result.message });
         onActionSuccess();
       } else {
         toast({
@@ -157,19 +157,19 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
           <AlertDialog open={isModalOpen} onOpenChange={setModalOpen}>
             <AlertDialogTrigger asChild>
               <Button size="sm" disabled={isPending}>
-                Checkout
+                Pinjam
               </Button>
             </AlertDialogTrigger>
             <AlertDialogContent>
               <AlertDialogHeader>
-                <AlertDialogTitle>Checkout {equipment.name}</AlertDialogTitle>
+                <AlertDialogTitle>Pinjam {equipment.name}</AlertDialogTitle>
                 <AlertDialogDescription>
-                  Enter the details below to borrow this item.
+                  Masukkan detail di bawah ini untuk meminjam barang ini.
                 </AlertDialogDescription>
               </AlertDialogHeader>
               <div className="py-4 space-y-4 max-h-[60vh] overflow-y-auto pr-4">
                 <div className="space-y-2">
-                  <Label htmlFor="borrowerName">Your Name</Label>
+                  <Label htmlFor="borrowerName">Nama Anda</Label>
                   <Input
                     id="borrowerName"
                     value={borrowerName}
@@ -180,33 +180,33 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                 </div>
                 <div className="space-y-2">
                   <Label htmlFor="borrowerPhone">
-                    Phone Number (Optional)
+                    Nomor Telepon (Opsional)
                   </Label>
                   <Input
                     id="borrowerPhone"
                     name="borrowerPhone"
-                    placeholder="e.g. 08123456789"
+                    placeholder="cth. 08123456789"
                     value={borrowerPhone}
                     onChange={(e) => setBorrowerPhone(e.target.value)}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="place">Place</Label>
+                  <Label htmlFor="place">Tempat</Label>
                   <Input
                     id="place"
                     value={place}
                     onChange={(e) => setPlace(e.target.value)}
-                    placeholder="e.g. Room 201, Offsite Event"
+                    placeholder="cth. Ruang 201, Acara Luar"
                     required
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="description">Purpose/Description</Label>
+                  <Label htmlFor="description">Tujuan/Deskripsi</Label>
                   <Textarea
                     id="description"
                     value={description}
                     onChange={(e) => setDescription(e.target.value)}
-                    placeholder="Describe the purpose of borrowing this item..."
+                    placeholder="Jelaskan tujuan meminjam barang ini..."
                     required
                   />
                 </div>
@@ -222,13 +222,13 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                     htmlFor="one-day-checkout-modal"
                     className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                   >
-                    1-Day Checkout (Return tomorrow)
+                    Pinjam 1 Hari (Kembali besok)
                   </label>
                 </div>
 
                 {!isOneDayCheckout && (
                   <div className="space-y-2">
-                    <Label>Select Borrowing Period</Label>
+                    <Label>Pilih Periode Pinjam</Label>
                     <div className="grid grid-cols-2 gap-2">
                       <Popover>
                         <PopoverTrigger asChild>
@@ -240,7 +240,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                             {dateRange?.from ? (
                               format(dateRange.from, 'LLL dd, y')
                             ) : (
-                              <span>Borrow Date</span>
+                              <span>Tanggal Pinjam</span>
                             )}
                           </Button>
                         </PopoverTrigger>
@@ -268,7 +268,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                             {dateRange?.to ? (
                               format(dateRange.to, 'LLL dd, y')
                             ) : (
-                              <span>Return Date</span>
+                              <span>Tanggal Kembali</span>
                             )}
                           </Button>
                         </PopoverTrigger>
@@ -296,16 +296,16 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                         setDateRange((prev) => ({ ...prev, from: new Date() }))
                       }
                     >
-                      Set Borrow Date to Today
+                      Atur Tanggal Pinjam ke Hari Ini
                     </Button>
                   </div>
                 )}
               </div>
               <AlertDialogFooter>
-                <AlertDialogCancel>Cancel</AlertDialogCancel>
+                <AlertDialogCancel>Batal</AlertDialogCancel>
                 <AlertDialogAction onClick={handleCheckout} disabled={isPending}>
                   {isPending && <Loader2 className="mr-2 animate-spin" />}
-                  Confirm Checkout
+                  Konfirmasi Pinjam
                 </AlertDialogAction>
               </AlertDialogFooter>
             </AlertDialogContent>
@@ -313,10 +313,11 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
         );
       case 'Borrowed':
       case 'Follow Up':
+      case 'Reminder':
         return (
           <Button size="sm" onClick={handleCheckin} disabled={isPending}>
             {isPending && <Loader2 className="mr-2 animate-spin" />}
-            Check-in
+            Kembali
           </Button>
         );
 
@@ -329,7 +330,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
             variant="outline"
           >
             {isPending && <Loader2 className="mr-2 animate-spin" />}
-            Mark Repaired
+            Tandai Selesai Diperbaiki
           </Button>
         );
       default:
@@ -347,13 +348,13 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
           <Button asChild variant="outline" size="sm">
             <Link href={`/equipment/${equipment.id}`}>
               <FileText />
-              <span className="ml-2">Details</span>
+              <span className="ml-2">Detail</span>
             </Link>
           </Button>
           <AlertDialogTrigger asChild>
             <Button variant="destructive" size="icon">
               <Trash2 />
-              <span className="sr-only">Delete</span>
+              <span className="sr-only">Hapus</span>
             </Button>
           </AlertDialogTrigger>
         </div>
@@ -364,21 +365,21 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
             <DropdownMenuTrigger asChild>
               <Button variant="ghost" size="icon" className="h-8 w-8">
                 <MoreHorizontal className="h-4 w-4" />
-                <span className="sr-only">More actions</span>
+                <span className="sr-only">Aksi lainnya</span>
               </Button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
               <DropdownMenuItem asChild>
                 <Link href={`/equipment/${equipment.id}`}>
                   <FileText className="mr-2" />
-                  Details
+                  Detail
                 </Link>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <AlertDialogTrigger asChild>
                 <DropdownMenuItem className="text-destructive focus:text-destructive">
                   <Trash2 className="mr-2" />
-                  Delete
+                  Hapus
                 </DropdownMenuItem>
               </AlertDialogTrigger>
             </DropdownMenuContent>
@@ -387,21 +388,21 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
       </div>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Are you sure?</AlertDialogTitle>
+          <AlertDialogTitle>Apakah Anda yakin?</AlertDialogTitle>
           <AlertDialogDescription>
-            This action cannot be undone. This will permanently delete the
-            equipment "{equipment.name}" and all of its history.
+            Tindakan ini tidak dapat dibatalkan. Ini akan menghapus secara permanen
+            peralatan "{equipment.name}" dan semua riwayatnya.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel>Batal</AlertDialogCancel>
           <AlertDialogAction
             onClick={handleDelete}
             disabled={isPending}
             className="bg-destructive hover:bg-destructive/90 text-destructive-foreground"
           >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Delete
+            Hapus
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

@@ -62,7 +62,7 @@ export default async function EquipmentDetailsPage({
           <EditEquipmentForm equipment={equipment} />
            <Card>
             <CardHeader>
-              <CardTitle>Actions</CardTitle>
+              <CardTitle>Aksi</CardTitle>
             </CardHeader>
             <CardContent>
               <EquipmentActions equipment={equipment} />
@@ -76,37 +76,37 @@ export default async function EquipmentDetailsPage({
             </CardHeader>
             <CardContent className="space-y-4">
               <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Current Status</span>
+                <span className="text-muted-foreground">Status Saat Ini</span>
                 <StatusBadge status={equipment.status} />
               </div>
               {(equipment.status === 'Borrowed' || equipment.status === 'Follow Up') && equipment.borrowedBy && (
                  <>
                   <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Borrowed By</span>
+                      <span className="text-muted-foreground">Dipinjam Oleh</span>
                       <span>{equipment.borrowedBy}</span>
                   </div>
                    {equipment.borrowerPhone && (
                      <div className="flex justify-between items-center">
-                       <span className="text-muted-foreground">Phone</span>
+                       <span className="text-muted-foreground">Telepon</span>
                        <span>{equipment.borrowerPhone}</span>
                      </div>
                    )}
                    {equipment.borrowedFrom && (
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Borrowed From</span>
+                      <span className="text-muted-foreground">Dipinjam Sejak</span>
                       <span>{format(new Date(equipment.borrowedFrom), 'PPP')}</span>
                     </div>
                   )}
                   {equipment.borrowedUntil && (
                     <div className="flex justify-between items-center">
-                      <span className="text-muted-foreground">Return By</span>
+                      <span className="text-muted-foreground">Kembali Pada</span>
                       <span>{format(new Date(equipment.borrowedUntil), 'PPP')}</span>
                     </div>
                   )}
                  </>
               )}
                <div className="flex justify-between items-center">
-                <span className="text-muted-foreground">Equipment ID</span>
+                <span className="text-muted-foreground">ID Peralatan</span>
                 <span className="font-mono text-sm">{equipment.id}</span>
               </div>
             </CardContent>

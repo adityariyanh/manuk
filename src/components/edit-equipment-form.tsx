@@ -33,14 +33,14 @@ export function EditEquipmentForm({ equipment }: { equipment: Equipment }) {
       const result = await updateEquipmentDetails(equipment.id, formData);
       if (result.success) {
         toast({
-          title: 'Success!',
+          title: 'Sukses!',
           description: result.message,
         });
       } else {
         toast({
           variant: 'destructive',
-          title: 'Update Failed',
-          description: result.message || 'An unknown error occurred.',
+          title: 'Pembaruan Gagal',
+          description: result.message || 'Terjadi kesalahan yang tidak diketahui.',
         });
       }
     });
@@ -50,14 +50,14 @@ export function EditEquipmentForm({ equipment }: { equipment: Equipment }) {
     <form onSubmit={handleSubmit}>
       <Card>
         <CardHeader>
-          <CardTitle>Edit Equipment Details</CardTitle>
+          <CardTitle>Ubah Detail Peralatan</CardTitle>
           <CardDescription>
-            Make changes to the equipment information below.
+            Buat perubahan pada informasi peralatan di bawah ini.
           </CardDescription>
         </CardHeader>
         <CardContent className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <Label htmlFor="name">Equipment Name</Label>
+            <Label htmlFor="name">Nama Peralatan</Label>
             <Input
               id="name"
               name="name"
@@ -68,7 +68,7 @@ export function EditEquipmentForm({ equipment }: { equipment: Equipment }) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="brand">Brand</Label>
+            <Label htmlFor="brand">Merek</Label>
             <Input
               id="brand"
               name="brand"
@@ -90,7 +90,7 @@ export function EditEquipmentForm({ equipment }: { equipment: Equipment }) {
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="category">Category</Label>
+            <Label htmlFor="category">Kategori</Label>
             <Input
               id="category"
               name="category"
@@ -104,7 +104,7 @@ export function EditEquipmentForm({ equipment }: { equipment: Equipment }) {
         <CardFooter className="flex justify-end">
           <Button type="submit" disabled={isPending}>
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Changes
+            Simpan Perubahan
           </Button>
         </CardFooter>
       </Card>

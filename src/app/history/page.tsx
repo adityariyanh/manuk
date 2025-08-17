@@ -36,11 +36,11 @@ export default function HistoryPage() {
         setLogs(logData);
         setEquipmentList(equipmentData);
       } catch (error) {
-        console.error('Failed to fetch history data', error);
+        console.error('Gagal mengambil data riwayat', error);
         toast({
           variant: 'destructive',
           title: 'Error',
-          description: 'Failed to load history data.',
+          description: 'Gagal memuat data riwayat.',
         });
       } finally {
         setLoading(false);
@@ -51,31 +51,31 @@ export default function HistoryPage() {
 
   const getEquipmentName = (equipmentId: string) => {
     const equipment = equipmentList.find((e) => e.id === equipmentId);
-    return equipment ? equipment.name : 'Unknown';
+    return equipment ? equipment.name : 'Tidak Diketahui';
   };
 
   const exportToCsv = () => {
     if (!logs.length) {
       toast({
         variant: 'destructive',
-        title: 'No Data',
-        description: 'There is no history to export.',
+        title: 'Tidak Ada Data',
+        description: 'Tidak ada riwayat untuk diekspor.',
       });
       return;
     }
 
     const dataToExport = logs.map((log) => ({
-      'Equipment Name': getEquipmentName(log.equipmentId),
-      'Action': log.action,
-      'User': log.user || 'N/A',
-      'Notes': log.notes || 'N/A',
-      'Date': format(log.timestamp, 'yyyy-MM-dd HH:mm:ss'),
+      'Nama Peralatan': getEquipmentName(log.equipmentId),
+      'Aksi': log.action,
+      'Pengguna': log.user || 'N/A',
+      'Catatan': log.notes || 'N/A',
+      'Tanggal': format(log.timestamp, 'yyyy-MM-dd HH:mm:ss'),
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(dataToExport);
     const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, 'History Log');
-    XLSX.writeFile(workbook, 'manuc_history_log.csv');
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Log Riwayat');
+    XLSX.writeFile(workbook, 'manuc_log_riwayat.csv');
   };
 
   return (
@@ -84,13 +84,13 @@ export default function HistoryPage() {
         <div>
           <h1 className="text-2xl font-bold font-headline flex items-center gap-2">
             <History />
-            History Log
+            Log Riwayat
           </h1>
-          <p className="text-muted-foreground">A complete log of all equipment activity.</p>
+          <p className="text-muted-foreground">Log lengkap semua aktivitas peralatan.</p>
         </div>
         <Button onClick={exportToCsv} className="w-full md:w-auto">
           <Download className="mr-2" />
-          Export as CSV
+          Ekspor sebagai CSV
         </Button>
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
@@ -118,11 +118,11 @@ export default function HistoryPage() {
               <Table>
                 <TableHeader>
                   <TableRow>
-                    <TableHead className="min-w-[150px] md:min-w-[200px]">Equipment</TableHead>
-                    <TableHead>Action</TableHead>
-                    <TableHead className="min-w-[120px]">User</TableHead>
-                    <TableHead className="min-w-[200px] md:min-w-[250px]">Notes</TableHead>
-                    <TableHead className="text-right min-w-[150px]">Date</TableHead>
+                    <TableHead className="min-w-[150px] md:min-w-[200px]">Peralatan</TableHead>
+                    <TableHead>Aksi</TableHead>
+                    <TableHead className="min-w-[120px]">Pengguna</TableHead>
+                    <TableHead className="min-w-[200px] md:min-w-[250px]">Catatan</TableHead>
+                    <TableHead className="text-right min-w-[150px]">Tanggal</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -159,8 +159,8 @@ export default function HistoryPage() {
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground bg-card rounded-lg p-8">
             <History className="w-16 h-16 mb-4" />
-            <h2 className="text-2xl font-bold">No History Found</h2>
-            <p>No activity has been logged yet.</p>
+            <h2 className="text-2xl font-bold">Tidak Ada Riwayat Ditemukan</h2>
+            <p>Belum ada aktivitas yang dicatat.</p>
           </div>
         )}
       </main>

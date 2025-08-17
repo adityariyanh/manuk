@@ -17,10 +17,10 @@ import { addDays, startOfDay } from 'date-fns';
 import type { Equipment } from './types';
 
 const equipmentSchema = z.object({
-  name: z.string().min(1, 'Name is required'),
-  brand: z.string().min(2, 'Brand must be at least 2 characters'),
-  model: z.string().min(1, 'Model is required'),
-  category: z.string().min(2, 'Category must be at least 2 characters'),
+  name: z.string().min(1, 'Nama wajib diisi'),
+  brand: z.string().min(2, 'Merek harus minimal 2 karakter'),
+  model: z.string().min(1, 'Model wajib diisi'),
+  category: z.string().min(2, 'Kategori harus minimal 2 karakter'),
 });
 
 export type FormState = {
@@ -47,7 +47,7 @@ export async function registerEquipment(
 
   if (!validatedFields.success) {
     return {
-      message: 'Failed to create equipment.',
+      message: 'Gagal membuat peralatan.',
       errors: validatedFields.error.flatten().fieldErrors,
       success: false,
     };
@@ -61,16 +61,16 @@ export async function registerEquipment(
     revalidatePath('/equipment/new');
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'An unknown error occurred';
+      error instanceof Error ? error.message : 'Terjadi kesalahan yang tidak diketahui';
     console.error('Database Error:', error);
     return {
-      message: `Database Error: Failed to create equipment. ${message}`,
+      message: `Database Error: Gagal membuat peralatan. ${message}`,
       success: false,
     };
   }
 
   return {
-    message: `Successfully added "${validatedFields.data.name}".`,
+    message: `Berhasil menambahkan "${validatedFields.data.name}".`,
     success: true,
   };
 }
@@ -81,7 +81,7 @@ export async function updateEquipmentDetails(equipmentId: string, equipmentData:
     if (!validatedFields.success) {
         return {
             success: false,
-            message: "Validation failed: " + validatedFields.error.flatten().fieldErrors,
+            message: "Validasi gagal: " + validatedFields.error.flatten().fieldErrors,
         };
     }
 
@@ -91,14 +91,14 @@ export async function updateEquipmentDetails(equipmentId: string, equipmentData:
             equipmentId,
             action: 'Updated',
             user: 'Admin',
-            notes: 'Equipment details updated.'
+            notes: 'Detail peralatan diperbarui.'
         });
         revalidatePath('/');
         revalidatePath(`/equipment/${equipmentId}`);
         revalidatePath('/history');
-        return { success: true, message: 'Equipment updated successfully.' };
+        return { success: true, message: 'Peralatan berhasil diperbarui.' };
     } catch (error) {
-        const message = error instanceof Error ? error.message : 'An unknown error occurred';
+        const message = error instanceof Error ? error.message : 'Terjadi kesalahan yang tidak diketahui';
         return { success: false, message: `Database Error: ${message}` };
     }
 }
@@ -112,7 +112,7 @@ export async function bulkRegisterEquipment(equipmentData: unknown) {
     console.error(validatedFields.error.flatten());
     return {
       success: false,
-      message: 'Data validation failed. Please check the file format and content.',
+      message: 'Validasi data gagal. Silakan periksa format dan konten file.',
       errors: validatedFields.error.flatten().fieldErrors,
     };
   }
@@ -124,17 +124,17 @@ export async function bulkRegisterEquipment(equipmentData: unknown) {
     revalidatePath('/equipment/new');
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'An unknown error occurred';
+      error instanceof Error ? error.message : 'Terjadi kesalahan yang tidak diketahui';
     console.error('Bulk Add Database Error:', error);
     return {
       success: false,
-      message: `Database Error: Failed to add equipment in bulk. ${message}`,
+      message: `Database Error: Gagal menambahkan peralatan secara massal. ${message}`,
     };
   }
     
   return {
     success: true,
-    message: `Successfully added ${validatedFields.data.length} equipment items.`,
+    message: `Berhasil menambahkan ${validatedFields.data.length} item peralatan.`,
   };
 }
 
@@ -149,7 +149,7 @@ export async function checkoutEquipment(
   borrowedUntil?: Date
 ) {
   try {
-    const notes = `Place: ${place}. Purpose: ${description}.`;
+    const notes = `Tempat: ${place}. Tujuan: ${description}.`;
     const updateData: Partial<Equipment> = {
       status: 'Borrowed',
       borrowedBy: user,
@@ -168,13 +168,13 @@ export async function checkoutEquipment(
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
     revalidatePath('/history');
-    return { success: true, message: 'Equipment checked out successfully.' };
+    return { success: true, message: 'Peralatan berhasil dipinjam.' };
   } catch (error) {
     console.error('Checkout Error:', error);
     const message =
       error instanceof Error
         ? error.message
-        : 'Failed to checkout equipment.';
+        : 'Gagal meminjam peralatan.';
     return { success: false, message };
   }
 }
@@ -201,10 +201,10 @@ export async function checkinEquipment(equipmentId: string) {
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
     revalidatePath('/history');
-    return { success: true, message: 'Equipment checked in successfully.' };
+    return { success: true, message: 'Peralatan berhasil dikembalikan.' };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'Failed to checkin equipment.';
+      error instanceof Error ? error.message : 'Gagal mengembalikan peralatan.';
     return { success: false, message };
   }
 }
@@ -216,10 +216,10 @@ export async function markAsRepaired(equipmentId: string) {
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
     revalidatePath('/history');
-    return { success: true, message: 'Equipment marked as repaired.' };
+    return { success: true, message: 'Peralatan ditandai selesai diperbaiki.' };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'Failed to mark as repaired.';
+      error instanceof Error ? error.message : 'Gagal menandai selesai diperbaiki.';
     return { success: false, message };
   }
 }
@@ -239,8 +239,8 @@ export async function reportForRepair(
 
   if (!equipmentId || !userName || !problem) {
     return {
-      message: 'Invalid input',
-      error: 'Missing required fields.',
+      message: 'Input tidak valid',
+      error: 'Bidang yang wajib diisi tidak ada.',
       success: false,
     };
   }
@@ -249,8 +249,8 @@ export async function reportForRepair(
     const equipment = await getEquipmentById(equipmentId);
     if (!equipment) {
       return {
-        message: 'Equipment not found',
-        error: 'The specified equipment does not exist.',
+        message: 'Peralatan tidak ditemukan',
+        error: 'Peralatan yang ditentukan tidak ada.',
         success: false,
       };
     }
@@ -267,11 +267,11 @@ export async function reportForRepair(
     revalidatePath(`/equipment/${equipmentId}`);
     revalidatePath('/history');
 
-    return { message: 'Successfully reported for repair.', success: true };
+    return { message: 'Berhasil dilaporkan untuk perbaikan.', success: true };
   } catch (error) {
     const errorMessage = error instanceof Error ? error.message : String(error);
     console.error('Report for Repair Error:', errorMessage);
-    return { message: 'An error occurred', error: errorMessage, success: false };
+    return { message: 'Terjadi kesalahan', error: errorMessage, success: false };
   }
 }
 
@@ -280,16 +280,16 @@ export async function deleteEquipment(equipmentId: string) {
     await deleteEquipmentData(equipmentId);
     revalidatePath('/');
     revalidatePath('/history');
-    return { success: true, message: 'Equipment deleted successfully.' };
+    return { success: true, message: 'Peralatan berhasil dihapus.' };
   } catch (error) {
     const message =
-      error instanceof Error ? error.message : 'Failed to delete equipment.';
+      error instanceof Error ? error.message : 'Gagal menghapus peralatan.';
     return { success: false, message };
   }
 }
 
 export async function checkReminders() {
-  console.log('Checking for reminders...');
+  console.log('Memeriksa pengingat...');
   const today = startOfDay(new Date());
   const twoDaysFromNow = addDays(today, 2);
 
@@ -308,9 +308,9 @@ export async function checkReminders() {
 
       if (borrowedUntilDate <= twoDaysFromNow) {
         console.log(
-          `Follow up triggered for ${
+          `Tindak lanjut dipicu untuk ${
             item.name
-          }. Due on: ${borrowedUntilDate.toDateString()}`
+          }. Jatuh tempo pada: ${borrowedUntilDate.toDateString()}`
         );
         await updateEquipment(item.id, {
           status: 'Follow Up',
@@ -319,6 +319,6 @@ export async function checkReminders() {
       }
     }
   } catch (error) {
-    console.error('Error checking for follow ups:', error);
+    console.error('Error saat memeriksa tindak lanjut:', error);
   }
 }
