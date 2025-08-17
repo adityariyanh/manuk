@@ -1,3 +1,4 @@
+
 'use client';
 
 import {
@@ -59,6 +60,16 @@ export function Dashboard() {
   useEffect(() => {
     fetchData();
   }, [toast]);
+  
+  const groupedEquipment = equipment.reduce((acc, item) => {
+    const category = item.category || 'Uncategorized';
+    if (!acc[category]) {
+      acc[category] = [];
+    }
+    acc[category].push(item);
+    return acc;
+  }, {} as { [key: string]: Equipment[] });
+
 
   if (loading) {
     return (
@@ -85,36 +96,45 @@ export function Dashboard() {
       </header>
       <main className="flex-1 p-4 overflow-y-auto">
         {equipment.length > 0 ? (
-          <div className="border rounded-lg">
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="w-[60%]">Name</TableHead>
-                  <TableHead className="w-[120px]">Status</TableHead>
-                  <TableHead className="text-right w-[150px]">
-                    Actions
-                  </TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                {equipment.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-medium">
-                       <div className="font-medium truncate">{item.name}</div>
-                       <div className="text-sm text-muted-foreground">
-                        {item.brand} - {item.model}
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <StatusBadge status={item.status} />
-                    </TableCell>
-                    <TableCell className="text-right">
-                      <DashboardActions equipment={item} onActionSuccess={fetchData} />
-                    </TableCell>
-                  </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+          <div className='space-y-8'>
+            {Object.entries(groupedEquipment)
+             .sort(([a], [b]) => a.localeCompare(b))
+             .map(([category, items]) => (
+              <div key={category}>
+                <h2 className="text-xl font-semibold font-headline mb-4 capitalize">{category}</h2>
+                <div className="border rounded-lg">
+                  <Table>
+                    <TableHeader>
+                      <TableRow>
+                        <TableHead className="w-[60%]">Name</TableHead>
+                        <TableHead className="w-[120px]">Status</TableHead>
+                        <TableHead className="text-right w-[150px]">
+                          Actions
+                        </TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {items.map((item) => (
+                        <TableRow key={item.id}>
+                          <TableCell className="font-medium">
+                            <div className="font-medium truncate">{item.name}</div>
+                            <div className="text-sm text-muted-foreground">
+                              {item.brand} - {item.model}
+                            </div>
+                          </TableCell>
+                          <TableCell>
+                            <StatusBadge status={item.status} />
+                          </TableCell>
+                          <TableCell className="text-right">
+                            <DashboardActions equipment={item} onActionSuccess={fetchData} />
+                          </TableCell>
+                        </TableRow>
+                      ))}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground bg-card rounded-lg p-8">
