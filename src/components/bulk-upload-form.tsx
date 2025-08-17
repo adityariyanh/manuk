@@ -82,6 +82,7 @@ export function BulkUploadForm() {
           const result = await bulkRegisterEquipment(dataToUpload);
           if (result.success) {
             toast({
+              variant: 'success',
               title: 'Unggah Berhasil!',
               description: result.message,
             });

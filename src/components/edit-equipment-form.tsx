@@ -33,6 +33,7 @@ export function EditEquipmentForm({ equipment }: { equipment: Equipment }) {
       const result = await updateEquipmentDetails(equipment.id, formData);
       if (result.success) {
         toast({
+          variant: 'success',
           title: 'Sukses!',
           description: result.message,
         });

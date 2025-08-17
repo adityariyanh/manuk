@@ -84,7 +84,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
         borrowedUntil
       );
       if (result.success) {
-        toast({ title: 'Sukses', description: result.message });
+        toast({ variant: 'success', title: 'Sukses', description: result.message });
         setBorrowerName('');
         setPlace('');
         setBorrowerPhone('');
@@ -106,7 +106,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
     startTransition(async () => {
       const result = await checkinEquipment(equipment.id);
       if (result.success) {
-        toast({ title: 'Sukses', description: result.message });
+        toast({ variant: 'success', title: 'Sukses', description: result.message });
         onActionSuccess();
       } else {
         toast({
@@ -122,7 +122,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
     startTransition(async () => {
       const result = await markAsRepaired(equipment.id);
       if (result.success) {
-        toast({ title: 'Sukses', description: result.message });
+        toast({ variant: 'success', title: 'Sukses', description: result.message });
         onActionSuccess();
       } else {
         toast({
@@ -138,7 +138,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
     startTransition(async () => {
       const result = await deleteEquipment(equipment.id);
       if (result.success) {
-        toast({ title: 'Sukses', description: result.message });
+        toast({ variant: 'success', title: 'Sukses', description: result.message });
         onActionSuccess();
       } else {
         toast({

@@ -30,6 +30,7 @@ export function EquipmentForm() {
   useEffect(() => {
     if (state.success) {
       toast({
+        variant: 'success',
         title: 'Sukses!',
         description: state.message,
       });

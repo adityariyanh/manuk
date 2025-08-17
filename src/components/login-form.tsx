@@ -51,6 +51,7 @@ export function LoginForm() {
       try {
         await signInWithEmailAndPassword(auth, email, password);
         toast({
+          variant: 'success',
           title: 'Login Berhasil!',
           description: 'Mengarahkan ke dasbor Anda...',
         });

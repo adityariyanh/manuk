@@ -98,6 +98,7 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
   const handleFormSubmit = (result: RepairState) => {
      if (result.success) {
       toast({
+        variant: 'success',
         title: 'Sukses',
         description: result.message,
       });
@@ -115,7 +116,7 @@ export function EquipmentActions({ equipment }: { equipment: Equipment }) {
     startRepairTransition(async () => {
       const result = await markAsRepaired(equipment.id);
       if (result.success) {
-        toast({ title: 'Sukses', description: result.message });
+        toast({ variant: 'success', title: 'Sukses', description: result.message });
       } else {
         toast({
           variant: 'destructive',

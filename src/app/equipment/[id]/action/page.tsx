@@ -78,7 +78,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
     const result = await checkoutEquipment(id, borrowerName, place, description, borrowerPhone, dateRange?.from, borrowedUntil);
 
     if (result.success) {
-      toast({ title: 'Sukses', description: result.message });
+      toast({ variant: 'success', title: 'Sukses', description: result.message });
       router.push(`/equipment/${id}`);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
@@ -90,7 +90,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
     setIsSubmitting(true);
     const result = await checkinEquipment(id);
     if (result.success) {
-      toast({ title: 'Sukses', description: result.message });
+      toast({ variant: 'success', title: 'Sukses', description: result.message });
       router.push(`/equipment/${id}`);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
