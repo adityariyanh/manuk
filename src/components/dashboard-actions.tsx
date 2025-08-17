@@ -40,10 +40,10 @@ import {
 } from 'lucide-react';
 import Link from 'next/link';
 import { useState, useTransition } from 'react';
-import { addDays, format, type DateRange } from 'date-fns';
-import { Checkbox } from './ui/checkbox';
+import { addDays, format, type DateRange, endOfDay } from 'date-fns';
 import { Popover, PopoverContent, PopoverTrigger } from './ui/popover';
 import { Calendar } from './ui/calendar';
+import { RadioGroup, RadioGroupItem } from './ui/radio-group';
 
 export function DashboardActions({ equipment, onActionSuccess }: { equipment: Equipment, onActionSuccess: () => void }) {
   const { toast } = useToast();
@@ -54,7 +54,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
   const [borrowerPhone, setBorrowerPhone] = useState('');
   const [place, setPlace] = useState('');
   const [description, setDescription] = useState('');
-  const [isOneDayCheckout, setIsOneDayCheckout] = useState(true);
+  const [borrowType, setBorrowType] = useState<'studio' | 'short' | 'long'>('short');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 1),
@@ -71,9 +71,19 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
       return;
     }
     startTransition(async () => {
-      const borrowedUntil = isOneDayCheckout
-        ? addDays(new Date(), 1)
-        : dateRange?.to;
+       let borrowedUntil;
+        switch(borrowType) {
+          case 'studio':
+            borrowedUntil = endOfDay(new Date());
+            break;
+          case 'short':
+            borrowedUntil = addDays(new Date(), 1);
+            break;
+          case 'long':
+            borrowedUntil = dateRange?.to;
+            break;
+        }
+
       const result = await checkoutEquipment(
         equipment.id,
         borrowerName,
@@ -89,7 +99,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
         setPlace('');
         setBorrowerPhone('');
         setDescription('');
-        setIsOneDayCheckout(true);
+        setBorrowType('short');
         setModalOpen(false);
         onActionSuccess();
       } else {
@@ -167,8 +177,8 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                   Masukkan detail di bawah ini untuk meminjam barang ini.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div className="py-4 -mx-4 px-4 max-h-[60vh] overflow-y-auto">
-                <div className='space-y-4'>
+              <div className="py-4 -mx-6 px-6 max-h-[60vh] overflow-y-auto">
+                <div className='space-y-4 pr-1'>
                   <div className="space-y-2">
                     <Label htmlFor="borrowerName">Nama Anda</Label>
                     <Input
@@ -211,23 +221,29 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                       required
                     />
                   </div>
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="one-day-checkout-modal"
-                      checked={isOneDayCheckout}
-                      onCheckedChange={(checked) =>
-                        setIsOneDayCheckout(Boolean(checked))
-                      }
-                    />
-                    <label
-                      htmlFor="one-day-checkout-modal"
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                  <div className="space-y-2">
+                    <Label>Jenis Peminjaman</Label>
+                    <RadioGroup 
+                      value={borrowType} 
+                      onValueChange={(value) => setBorrowType(value as any)}
+                      className="space-y-1"
                     >
-                      Pinjam 1 Hari (Kembali besok)
-                    </label>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="studio" id="studio-modal" />
+                        <Label htmlFor="studio-modal">Penggunaan Studio (Kembali hari ini)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="short" id="short-modal" />
+                        <Label htmlFor="short-modal">Pinjam Kurang dari 1 Hari (Kembali besok)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="long" id="long-modal" />
+                        <Label htmlFor="long-modal">Pinjam Lebih dari 1 Hari</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
 
-                  {!isOneDayCheckout && (
+                  {borrowType === 'long' && (
                     <div className="space-y-2">
                       <Label>Pilih Periode Pinjam</Label>
                       <div className="grid grid-cols-2 gap-2">

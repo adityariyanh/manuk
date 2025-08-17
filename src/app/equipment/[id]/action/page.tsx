@@ -13,12 +13,12 @@ import { Textarea } from '@/components/ui/textarea';
 import { useEffect, useState } from 'react';
 import type { Equipment } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Checkbox } from '@/components/ui/checkbox';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { CalendarIcon, Loader2 } from 'lucide-react';
-import { addDays, format, type DateRange } from 'date-fns';
+import { addDays, format, type DateRange, endOfDay } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
 interface PageProps {
   params: { id: string };
@@ -39,7 +39,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
   const [borrowerPhone, setBorrowerPhone] = useState('');
   const [place, setPlace] = useState('');
   const [description, setDescription] = useState('');
-  const [isOneDayCheckout, setIsOneDayCheckout] = useState(true);
+  const [borrowType, setBorrowType] = useState<'studio' | 'short' | 'long'>('short');
   const [dateRange, setDateRange] = useState<DateRange | undefined>({
     from: new Date(),
     to: addDays(new Date(), 1)
@@ -74,7 +74,19 @@ export default function EquipmentActionPage({ params }: PageProps) {
     }
 
     setIsSubmitting(true);
-    const borrowedUntil = isOneDayCheckout ? addDays(new Date(), 1) : dateRange?.to;
+    let borrowedUntil;
+    switch(borrowType) {
+      case 'studio':
+        borrowedUntil = endOfDay(new Date());
+        break;
+      case 'short':
+        borrowedUntil = addDays(new Date(), 1);
+        break;
+      case 'long':
+        borrowedUntil = dateRange?.to;
+        break;
+    }
+    
     const result = await checkoutEquipment(id, borrowerName, place, description, borrowerPhone, dateRange?.from, borrowedUntil);
 
     if (result.success) {
@@ -125,134 +137,146 @@ export default function EquipmentActionPage({ params }: PageProps) {
         <CardContent>
           {equipment.status === 'Available' && (
             <form onSubmit={handleCheckout} className="space-y-4">
-              <h2 className="text-lg font-semibold">Pinjam Barang</h2>
-              
-              <div className="space-y-2">
-                <Label htmlFor="borrowerName">Nama Anda</Label>
-                <Input
-                  id="borrowerName"
-                  name="borrowerName"
-                  placeholder="John Doe"
-                  required
-                  value={borrowerName}
-                  onChange={e => setBorrowerName(e.target.value)}
-                  disabled={isSubmitting}
-                />
-              </div>
+               <div className="py-4 -mx-6 px-6 max-h-[60vh] overflow-y-auto">
+                <div className='space-y-4 pr-1'>
+                  <h2 className="text-lg font-semibold">Pinjam Barang</h2>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="borrowerName">Nama Anda</Label>
+                    <Input
+                      id="borrowerName"
+                      name="borrowerName"
+                      placeholder="John Doe"
+                      required
+                      value={borrowerName}
+                      onChange={e => setBorrowerName(e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
 
-               <div className="space-y-2">
-                <Label htmlFor="borrowerPhone">Nomor Telepon (Opsional)</Label>
-                <Input
-                  id="borrowerPhone"
-                  name="borrowerPhone"
-                  placeholder="cth. 08123456789"
-                  value={borrowerPhone}
-                  onChange={e => setBorrowerPhone(e.target.value)}
-                  disabled={isSubmitting}
-                />
-              </div>
+                   <div className="space-y-2">
+                    <Label htmlFor="borrowerPhone">Nomor Telepon (Opsional)</Label>
+                    <Input
+                      id="borrowerPhone"
+                      name="borrowerPhone"
+                      placeholder="cth. 08123456789"
+                      value={borrowerPhone}
+                      onChange={e => setBorrowerPhone(e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
 
-               <div className="space-y-2">
-                <Label htmlFor="place">Tempat</Label>
-                <Input
-                  id="place"
-                  name="place"
-                  placeholder="cth. Ruang 201, Acara di Luar"
-                  required
-                  value={place}
-                  onChange={e => setPlace(e.target.value)}
-                  disabled={isSubmitting}
-                />
-              </div>
-              <div className="space-y-2">
-                <Label htmlFor="description">Tujuan/Deskripsi</Label>
-                <Textarea
-                  id="description"
-                  name="description"
-                  placeholder="Jelaskan tujuan meminjam barang ini..."
-                  required
-                  value={description}
-                  onChange={e => setDescription(e.target.value)}
-                  disabled={isSubmitting}
-                />
-              </div>
+                   <div className="space-y-2">
+                    <Label htmlFor="place">Tempat</Label>
+                    <Input
+                      id="place"
+                      name="place"
+                      placeholder="cth. Ruang 201, Acara di Luar"
+                      required
+                      value={place}
+                      onChange={e => setPlace(e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="description">Tujuan/Deskripsi</Label>
+                    <Textarea
+                      id="description"
+                      name="description"
+                      placeholder="Jelaskan tujuan meminjam barang ini..."
+                      required
+                      value={description}
+                      onChange={e => setDescription(e.target.value)}
+                      disabled={isSubmitting}
+                    />
+                  </div>
 
-               <div className="flex items-center space-x-2">
-                <Checkbox 
-                  id="one-day-checkout" 
-                  checked={isOneDayCheckout}
-                  onCheckedChange={(checked) => setIsOneDayCheckout(Boolean(checked))}
-                  disabled={isSubmitting}
-                />
-                <label
-                  htmlFor="one-day-checkout"
-                  className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                >
-                  Pinjam 1 Hari (Kembali besok)
-                </label>
-              </div>
-
-              {!isOneDayCheckout && (
-                <div className="space-y-2">
-                   <Label>Pilih Periode Peminjaman</Label>
-                   <div className="grid grid-cols-2 gap-2">
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant={"outline"}
-                            className="w-full justify-start text-left font-normal"
-                            disabled={isSubmitting}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.from ? format(dateRange.from, "LLL dd, y") : <span>Tanggal Pinjam</span>}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={dateRange?.from}
-                            onSelect={(date) => setDateRange(prev => ({...prev, from: date}))}
-                            disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                           <Button
-                            variant={"outline"}
-                            className="w-full justify-start text-left font-normal"
-                            disabled={isSubmitting}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {dateRange?.to ? format(dateRange.to, "LLL dd, y") : <span>Tanggal Kembali</span>}
-                          </Button>
-                        </PopoverTrigger>
-                         <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={dateRange?.to}
-                            onSelect={(date) => setDateRange(prev => ({...prev, to: date}))}
-                             disabled={(date) => 
-                                (dateRange?.from && date < dateRange.from) || 
-                                date < new Date(new Date().setHours(0,0,0,0))
-                            }
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                   </div>
-                   <Button 
-                      type="button" 
-                      variant="ghost" 
-                      className="w-full"
-                      onClick={() => setDateRange(prev => ({...prev, from: new Date()}))}
+                  <div className="space-y-2">
+                    <Label>Jenis Peminjaman</Label>
+                    <RadioGroup 
+                      value={borrowType} 
+                      onValueChange={(value) => setBorrowType(value as any)}
+                      className="space-y-1"
                       disabled={isSubmitting}
                     >
-                      Atur Tanggal Pinjam ke Hari Ini
-                    </Button>
-                </div>
-              )}
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="studio" id="studio" />
+                        <Label htmlFor="studio">Penggunaan Studio (Kembali hari ini)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="short" id="short" />
+                        <Label htmlFor="short">Pinjam Kurang dari 1 Hari (Kembali besok)</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="long" id="long" />
+                        <Label htmlFor="long">Pinjam Lebih dari 1 Hari</Label>
+                      </div>
+                    </RadioGroup>
+                  </div>
+
+                  {borrowType === 'long' && (
+                    <div className="space-y-2">
+                       <Label>Pilih Periode Peminjaman</Label>
+                       <div className="grid grid-cols-2 gap-2">
+                          <Popover>
+                            <PopoverTrigger asChild>
+                              <Button
+                                variant={"outline"}
+                                className="w-full justify-start text-left font-normal"
+                                disabled={isSubmitting}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {dateRange?.from ? format(dateRange.from, "LLL dd, y") : <span>Tanggal Pinjam</span>}
+                              </Button>
+                            </PopoverTrigger>
+                            <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={dateRange?.from}
+                                onSelect={(date) => setDateRange(prev => ({...prev, from: date}))}
+                                disabled={(date) => date < new Date(new Date().setHours(0,0,0,0))}
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                          <Popover>
+                            <PopoverTrigger asChild>
+                               <Button
+                                variant={"outline"}
+                                className="w-full justify-start text-left font-normal"
+                                disabled={isSubmitting}
+                              >
+                                <CalendarIcon className="mr-2 h-4 w-4" />
+                                {dateRange?.to ? format(dateRange.to, "LLL dd, y") : <span>Tanggal Kembali</span>}
+                              </Button>
+                            </PopoverTrigger>
+                             <PopoverContent className="w-auto p-0" align="start">
+                              <Calendar
+                                mode="single"
+                                selected={dateRange?.to}
+                                onSelect={(date) => setDateRange(prev => ({...prev, to: date}))}
+                                 disabled={(date) => 
+                                    (dateRange?.from && date < dateRange.from) || 
+                                    date < new Date(new Date().setHours(0,0,0,0))
+                                }
+                                initialFocus
+                              />
+                            </PopoverContent>
+                          </Popover>
+                       </div>
+                       <Button 
+                          type="button" 
+                          variant="ghost" 
+                          className="w-full"
+                          onClick={() => setDateRange(prev => ({...prev, from: new Date()}))}
+                          disabled={isSubmitting}
+                        >
+                          Atur Tanggal Pinjam ke Hari Ini
+                        </Button>
+                    </div>
+                  )}
+                 </div>
+              </div>
 
               <Button type="submit" className="w-full" disabled={isSubmitting}>
                 {isSubmitting && <Loader2 className="mr-2 animate-spin" />}
