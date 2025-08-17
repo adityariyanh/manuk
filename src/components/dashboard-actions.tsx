@@ -62,11 +62,12 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
   const [isModalOpen, setModalOpen] = useState(false);
 
   const handleCheckout = () => {
-    if (!borrowerName.trim() || !place.trim() || !description.trim()) {
+    const isStudioUsage = borrowType === 'studio';
+    if (!borrowerName.trim() || (!isStudioUsage && !place.trim()) || !description.trim()) {
       toast({
         variant: 'destructive',
         title: 'Error Pinjam',
-        description: 'Nama, Tempat, dan Tujuan wajib diisi.',
+        description: 'Nama, Tempat (jika relevan), dan Tujuan wajib diisi.',
       });
       return;
     }
@@ -83,11 +84,12 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
             borrowedUntil = dateRange?.to;
             break;
         }
-
+      
+      const finalPlace = isStudioUsage ? 'Studio' : place;
       const result = await checkoutEquipment(
         equipment.id,
         borrowerName,
-        place,
+        finalPlace,
         description,
         borrowerPhone,
         dateRange?.from,
@@ -177,7 +179,7 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                   Masukkan detail di bawah ini untuk meminjam barang ini.
                 </AlertDialogDescription>
               </AlertDialogHeader>
-              <div className="py-4 -mx-6 px-6 max-h-[60vh] overflow-y-auto">
+              <div className="py-4 -mx-4 px-4 max-h-[60vh] overflow-y-auto">
                 <div className='space-y-4 pr-1'>
                   <div className="space-y-2">
                     <Label htmlFor="borrowerName">Nama Anda</Label>
@@ -202,15 +204,40 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                     />
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="place">Tempat</Label>
-                    <Input
-                      id="place"
-                      value={place}
-                      onChange={(e) => setPlace(e.target.value)}
-                      placeholder="cth. Ruang 201, Acara Luar"
-                      required
-                    />
+                    <Label>Jenis Peminjaman</Label>
+                    <RadioGroup 
+                      value={borrowType} 
+                      onValueChange={(value) => setBorrowType(value as any)}
+                      className="space-y-1"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="studio" id="studio-modal" />
+                        <Label htmlFor="studio-modal">Penggunaan Studio</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="short" id="short-modal" />
+                        <Label htmlFor="short-modal">Pinjam Kurang dari 1 Hari</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="long" id="long-modal" />
+                        <Label htmlFor="long-modal">Pinjam Lebih dari 1 Hari</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
+                  
+                  {borrowType !== 'studio' && (
+                    <div className="space-y-2">
+                      <Label htmlFor="place">Tempat</Label>
+                      <Input
+                        id="place"
+                        value={place}
+                        onChange={(e) => setPlace(e.target.value)}
+                        placeholder="cth. Ruang 201, Acara Luar"
+                        required
+                      />
+                    </div>
+                  )}
+
                   <div className="space-y-2">
                     <Label htmlFor="description">Tujuan/Deskripsi</Label>
                     <Textarea
@@ -220,27 +247,6 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
                       placeholder="Jelaskan tujuan meminjam barang ini..."
                       required
                     />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Jenis Peminjaman</Label>
-                    <RadioGroup 
-                      value={borrowType} 
-                      onValueChange={(value) => setBorrowType(value as any)}
-                      className="space-y-1"
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="studio" id="studio-modal" />
-                        <Label htmlFor="studio-modal">Penggunaan Studio (Kembali hari ini)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="short" id="short-modal" />
-                        <Label htmlFor="short-modal">Pinjam Kurang dari 1 Hari (Kembali besok)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="long" id="long-modal" />
-                        <Label htmlFor="long-modal">Pinjam Lebih dari 1 Hari</Label>
-                      </div>
-                    </RadioGroup>
                   </div>
 
                   {borrowType === 'long' && (

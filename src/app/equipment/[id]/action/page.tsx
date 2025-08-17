@@ -68,7 +68,8 @@ export default function EquipmentActionPage({ params }: PageProps) {
 
   async function handleCheckout(e: React.FormEvent) {
     e.preventDefault();
-    if (!borrowerName || !place || !description) {
+    const isStudioUsage = borrowType === 'studio';
+    if (!borrowerName || (!isStudioUsage && !place) || !description) {
       toast({ variant: 'destructive', title: 'Error', description: 'Silakan isi semua bidang yang wajib diisi.' });
       return;
     }
@@ -87,7 +88,8 @@ export default function EquipmentActionPage({ params }: PageProps) {
         break;
     }
     
-    const result = await checkoutEquipment(id, borrowerName, place, description, borrowerPhone, dateRange?.from, borrowedUntil);
+    const finalPlace = isStudioUsage ? 'Studio' : place;
+    const result = await checkoutEquipment(id, borrowerName, finalPlace, description, borrowerPhone, dateRange?.from, borrowedUntil);
 
     if (result.success) {
       toast({ variant: 'success', title: 'Sukses', description: result.message });
@@ -137,7 +139,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
         <CardContent>
           {equipment.status === 'Available' && (
             <form onSubmit={handleCheckout} className="space-y-4">
-               <div className="py-4 -mx-6 px-6 max-h-[60vh] overflow-y-auto">
+               <div className="py-4 -mx-4 px-4 max-h-[60vh] overflow-y-auto">
                 <div className='space-y-4 pr-1'>
                   <h2 className="text-lg font-semibold">Pinjam Barang</h2>
                   
@@ -165,19 +167,44 @@ export default function EquipmentActionPage({ params }: PageProps) {
                       disabled={isSubmitting}
                     />
                   </div>
-
-                   <div className="space-y-2">
-                    <Label htmlFor="place">Tempat</Label>
-                    <Input
-                      id="place"
-                      name="place"
-                      placeholder="cth. Ruang 201, Acara di Luar"
-                      required
-                      value={place}
-                      onChange={e => setPlace(e.target.value)}
+                  
+                  <div className="space-y-2">
+                    <Label>Jenis Peminjaman</Label>
+                    <RadioGroup 
+                      value={borrowType} 
+                      onValueChange={(value) => setBorrowType(value as any)}
+                      className="space-y-1"
                       disabled={isSubmitting}
-                    />
+                    >
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="studio" id="studio" />
+                        <Label htmlFor="studio">Penggunaan Studio</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="short" id="short" />
+                        <Label htmlFor="short">Pinjam Kurang dari 1 Hari</Label>
+                      </div>
+                      <div className="flex items-center space-x-2">
+                        <RadioGroupItem value="long" id="long" />
+                        <Label htmlFor="long">Pinjam Lebih dari 1 Hari</Label>
+                      </div>
+                    </RadioGroup>
                   </div>
+
+                   {borrowType !== 'studio' && (
+                     <div className="space-y-2">
+                      <Label htmlFor="place">Tempat</Label>
+                      <Input
+                        id="place"
+                        name="place"
+                        placeholder="cth. Ruang 201, Acara di Luar"
+                        required
+                        value={place}
+                        onChange={e => setPlace(e.target.value)}
+                        disabled={isSubmitting}
+                      />
+                    </div>
+                   )}
                   <div className="space-y-2">
                     <Label htmlFor="description">Tujuan/Deskripsi</Label>
                     <Textarea
@@ -189,29 +216,6 @@ export default function EquipmentActionPage({ params }: PageProps) {
                       onChange={e => setDescription(e.target.value)}
                       disabled={isSubmitting}
                     />
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label>Jenis Peminjaman</Label>
-                    <RadioGroup 
-                      value={borrowType} 
-                      onValueChange={(value) => setBorrowType(value as any)}
-                      className="space-y-1"
-                      disabled={isSubmitting}
-                    >
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="studio" id="studio" />
-                        <Label htmlFor="studio">Penggunaan Studio (Kembali hari ini)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="short" id="short" />
-                        <Label htmlFor="short">Pinjam Kurang dari 1 Hari (Kembali besok)</Label>
-                      </div>
-                      <div className="flex items-center space-x-2">
-                        <RadioGroupItem value="long" id="long" />
-                        <Label htmlFor="long">Pinjam Lebih dari 1 Hari</Label>
-                      </div>
-                    </RadioGroup>
                   </div>
 
                   {borrowType === 'long' && (
