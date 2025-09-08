@@ -142,11 +142,6 @@ export default function EquipmentActionPage() {
                 <CardDescription className='mt-2'>
                     {successContent.description}
                 </CardDescription>
-                <div className="mt-6">
-                    <Button asChild>
-                        <Link href="/">Kembali ke Dasbor</Link>
-                    </Button>
-                </div>
             </CardContent>
         </Card>
        </div>
@@ -337,15 +332,8 @@ export default function EquipmentActionPage() {
                 </Button>
             </div>
           )}
-           <div className="mt-4 text-center">
-            <Button asChild variant="link">
-              <Link href={`/equipment/${id}`}>Kembali ke Detail</Link>
-            </Button>
-          </div>
         </CardContent>
       </Card>
     </div>
   );
 }
-
-    
