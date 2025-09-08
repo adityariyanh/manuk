@@ -15,7 +15,7 @@ import type { Equipment } from '@/lib/types';
 import { Skeleton } from '@/components/ui/skeleton';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { CalendarIcon, Loader2 } from 'lucide-react';
+import { CalendarIcon, Loader2, CheckCircle } from 'lucide-react';
 import { addDays, format, type DateRange, endOfDay } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
@@ -34,6 +34,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showSuccessMessage, setShowSuccessMessage] = useState(false);
 
   const [borrowerName, setBorrowerName] = useState('');
   const [borrowerPhone, setBorrowerPhone] = useState('');
@@ -93,7 +94,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
 
     if (result.success) {
       toast({ variant: 'success', title: 'Sukses', description: result.message });
-      router.push(`/equipment/${id}`);
+      setShowSuccessMessage(true);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
       setIsSubmitting(false);
@@ -105,7 +106,7 @@ export default function EquipmentActionPage({ params }: PageProps) {
     const result = await checkinEquipment(id);
     if (result.success) {
       toast({ variant: 'success', title: 'Sukses', description: result.message });
-      router.push(`/equipment/${id}`);
+      setShowSuccessMessage(true); // Can also show success for check-in
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
       setIsSubmitting(false);
@@ -126,6 +127,26 @@ export default function EquipmentActionPage({ params }: PageProps) {
          </Card>
       </div>
     )
+  }
+
+  if (showSuccessMessage) {
+     return (
+       <div className="flex items-center justify-center min-h-screen bg-muted">
+        <Card className="w-full max-w-md text-center">
+            <CardHeader>
+               <div className='flex justify-center'>
+                 <CheckCircle className='w-24 h-24 text-green-500' />
+               </div>
+            </CardHeader>
+            <CardContent>
+                <CardTitle>Peminjaman Berhasil!</CardTitle>
+                <CardDescription className='mt-2'>
+                    Jangan lupa untuk mengembalikan barang tepat waktu ya.
+                </CardDescription>
+            </CardContent>
+        </Card>
+       </div>
+     )
   }
 
 
@@ -322,3 +343,5 @@ export default function EquipmentActionPage({ params }: PageProps) {
     </div>
   );
 }
+
+    
