@@ -29,7 +29,9 @@ export default function EquipmentActionPage() {
   const [equipment, setEquipment] = useState<Equipment | null>(null);
   const [loading, setLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  
   const [showSuccessMessage, setShowSuccessMessage] = useState(false);
+  const [successContent, setSuccessContent] = useState({ title: '', description: '' });
 
   const [borrowerName, setBorrowerName] = useState('');
   const [borrowerPhone, setBorrowerPhone] = useState('');
@@ -89,6 +91,7 @@ export default function EquipmentActionPage() {
 
     if (result.success) {
       toast({ variant: 'success', title: 'Sukses', description: result.message });
+      setSuccessContent({ title: 'Peminjaman Berhasil!', description: 'Jangan lupa untuk mengembalikan barang tepat waktu ya.' });
       setShowSuccessMessage(true);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
@@ -101,7 +104,8 @@ export default function EquipmentActionPage() {
     const result = await checkinEquipment(id);
     if (result.success) {
       toast({ variant: 'success', title: 'Sukses', description: result.message });
-      setShowSuccessMessage(true); // Can also show success for check-in
+      setSuccessContent({ title: 'Pengembalian Berhasil!', description: 'Terima kasih sudah mengembalikan. Sehat selalu!' });
+      setShowSuccessMessage(true);
     } else {
       toast({ variant: 'destructive', title: 'Error', description: result.message });
       setIsSubmitting(false);
@@ -134,10 +138,15 @@ export default function EquipmentActionPage() {
                </div>
             </CardHeader>
             <CardContent>
-                <CardTitle>Peminjaman Berhasil!</CardTitle>
+                <CardTitle>{successContent.title}</CardTitle>
                 <CardDescription className='mt-2'>
-                    Jangan lupa untuk mengembalikan barang tepat waktu ya.
+                    {successContent.description}
                 </CardDescription>
+                <div className="mt-6">
+                    <Button asChild>
+                        <Link href="/">Kembali ke Dasbor</Link>
+                    </Button>
+                </div>
             </CardContent>
         </Card>
        </div>

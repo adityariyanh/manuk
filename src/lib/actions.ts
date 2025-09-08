@@ -201,7 +201,7 @@ export async function checkinEquipment(equipmentId: string) {
     revalidatePath('/');
     revalidatePath(`/equipment/${equipmentId}`);
     revalidatePath('/history');
-    return { success: true, message: 'Peralatan berhasil dikembalikan.' };
+    return { success: true, message: 'Terima kasih sudah mengembalikan. Sehat selalu!' };
   } catch (error) {
     const message =
       error instanceof Error ? error.message : 'Gagal mengembalikan peralatan.';
