@@ -20,13 +20,8 @@ import { addDays, format, type DateRange, endOfDay } from 'date-fns';
 import { useToast } from '@/hooks/use-toast';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 
-interface PageProps {
-  params: { id: string };
-  searchParams: { [key: string]: string | string[] | undefined };
-}
-
-
-export default function EquipmentActionPage({ params }: PageProps) {
+export default function EquipmentActionPage() {
+  const params = useParams();
   const id = params.id as string;
   const router = useRouter();
   const { toast } = useToast();
