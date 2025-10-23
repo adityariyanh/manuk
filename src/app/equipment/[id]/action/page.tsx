@@ -154,7 +154,10 @@ export default function EquipmentActionPage() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>{equipment.name}</CardTitle>
-          <CardDescription>{equipment.brand} - {equipment.category}</CardDescription>
+          <p className="text-sm text-muted-foreground pt-1">
+            ESP. F-CBDMS.001 - Form Peminjaman Alat
+          </p>
+          <CardDescription className="pt-2">{equipment.brand} - {equipment.category}</CardDescription>
         </CardHeader>
         <CardContent>
           {equipment.status === 'Available' && (
@@ -327,9 +330,6 @@ export default function EquipmentActionPage() {
             <div className="text-center space-y-4">
                <h2 className="text-lg font-semibold text-destructive">Barang Sedang Diperbaiki</h2>
                <p>Barang ini sedang dalam perbaikan dan tidak dapat dipinjam.</p>
-                <Button asChild variant="outline">
-                    <Link href={`/equipment/${id}`}>Lihat Detail</Link>
-                </Button>
             </div>
           )}
         </CardContent>

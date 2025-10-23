@@ -175,6 +175,9 @@ export function DashboardActions({ equipment, onActionSuccess }: { equipment: Eq
             <AlertDialogContent>
               <AlertDialogHeader>
                 <AlertDialogTitle>Pinjam {equipment.name}</AlertDialogTitle>
+                <p className="text-sm text-muted-foreground">
+                  ESP. F-CBDMS.001 - Form Peminjaman Alat
+                </p>
                 <AlertDialogDescription>
                   Masukkan detail di bawah ini untuk meminjam barang ini.
                 </AlertDialogDescription>

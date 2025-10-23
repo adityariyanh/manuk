@@ -86,7 +86,10 @@ export function Dashboard() {
           <h1 className="text-2xl font-bold font-headline">
             Dasbor Peralatan
           </h1>
-          <p className="text-muted-foreground">
+          <p className="text-sm text-muted-foreground">
+            ESP. F-CBDMS.001 - Form Peminjaman Alat
+          </p>
+          <p className="text-muted-foreground mt-2">
             Gambaran umum semua peralatan dalam inventaris.
           </p>
         </div>
